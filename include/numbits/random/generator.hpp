@@ -23,9 +23,9 @@ ndarray<T> rand(const std::initializer_list<size_t>& shape) {
 
     // Use a thread-local RNG to avoid recreation cost
     static thread_local std::mt19937 gen(std::random_device{}());
+    static thread_local std::uniform_real_distribution<T> dist(static_cast<T>(0.0), static_cast<T>(1.0));
 
     ndarray<T> A(shape);
-    std::uniform_real_distribution<T> dist(static_cast<T>(0.0), static_cast<T>(1.0));
 
     for (auto& v : A.data())
         v = dist(gen);
