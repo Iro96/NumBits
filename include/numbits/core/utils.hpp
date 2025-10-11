@@ -12,6 +12,9 @@ T sum(const std::vector<T>& data) {
 
 template <typename T>
 T mean(const std::vector<T>& data) {
+    if (data.empty()) {
+        return T(0);
+    }
     return sum(data) / static_cast<T>(data.size());
 }
 
