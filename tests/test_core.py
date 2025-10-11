@@ -5,9 +5,16 @@
 using namespace numbits;
 
 int main() {
-    ndarray<int> x({2, 2}, 1);
-    assert(x.shape()[0] == 2);
-    assert(x.shape()[1] == 2);
-    std::cout << "NumBits test passed\n";
+    // Basic shape + element check
+    ndarray<int> a({2, 3}, 5);
+
+    assert(a.shape()[0] == 2);
+    assert(a.shape()[1] == 3);
+    assert(a(1, 2) == 5);
+
+    a(1, 2) = 42;
+    assert(a(1, 2) == 42);
+
+    std::cout << "NumBits basic test passed.\n";
     return 0;
 }
