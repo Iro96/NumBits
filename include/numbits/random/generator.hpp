@@ -6,12 +6,29 @@
 
 namespace numbits {
 
+namespace detail {
+/**
+ * @brief Thread-local random number generator shared by all random functions.
+ *
+ * This ensures:
+ * - No global state (safe for concurrent threads).
+ * - RNG engine constructed only once per thread.
+ */
+inline thread_local std::mt19937& global_rng() {
+    static thread_local std::mt19937 gen(std::random_device{}());
+    return gen;
+}
+} // namespace detail
+
 /**
  * @brief Generate a random ndarray with values uniformly distributed in [0, 1).
+ *
+ * Thread-safe: uses a thread-local RNG instance.
  *
  * @tparam T Floating-point type (float, double, long double).
  * @param shape Shape of the output array (must not be empty).
  * @return ndarray<T> filled with uniform random numbers.
+ * @throws std::invalid_argument if shape is empty.
  */
 template <typename T = double>
 ndarray<T> rand(const std::initializer_list<size_t>& shape) {
@@ -21,11 +38,12 @@ ndarray<T> rand(const std::initializer_list<size_t>& shape) {
     if (shape.size() == 0)
         throw std::invalid_argument("rand: shape cannot be empty");
 
-    // Use a thread-local RNG to avoid recreation cost
-    static thread_local std::mt19937 gen(std::random_device{}());
-    static thread_local std::uniform_real_distribution<T> dist(static_cast<T>(0.0), static_cast<T>(1.0));
-
     ndarray<T> A(shape);
+
+    // Uniform [0, 1)
+    static thread_local std::uniform_real_distribution<T> dist(static_cast<T>(0.0),
+                                                               static_cast<T>(1.0));
+    auto& gen = detail::global_rng();
 
     for (auto& v : A.data())
         v = dist(gen);
@@ -36,10 +54,12 @@ ndarray<T> rand(const std::initializer_list<size_t>& shape) {
 /**
  * @brief Generate a random ndarray with values from a normal (Gaussian) distribution.
  *
- * @tparam T Floating-point type.
+ * Thread-safe: uses a thread-local RNG instance.
+ *
+ * @tparam T Floating-point type (float, double, long double).
  * @param shape Shape of the output array.
  * @param mean Mean of the distribution.
- * @param stddev Standard deviation of the distribution (must be > 0).
+ * @param stddev Standard deviation (must be > 0).
  * @return ndarray<T> filled with Gaussian random numbers.
  * @throws std::invalid_argument if shape is empty or stddev <= 0.
  */
@@ -55,11 +75,10 @@ ndarray<T> randn(const std::initializer_list<size_t>& shape,
     if (stddev <= static_cast<T>(0))
         throw std::invalid_argument("randn: stddev must be > 0");
 
-    // Use a thread-local RNG to avoid reseeding every call
-    static thread_local std::mt19937 gen(std::random_device{}());
-
     ndarray<T> A(shape);
+
     std::normal_distribution<T> dist(mean, stddev);
+    auto& gen = detail::global_rng();
 
     for (auto& v : A.data())
         v = dist(gen);
