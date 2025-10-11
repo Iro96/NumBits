@@ -7,7 +7,7 @@
 #include <functional>
 #include <algorithm>
 
-namespace nb {
+namespace numbits {
 
 template <typename T>
 class ndarray {
