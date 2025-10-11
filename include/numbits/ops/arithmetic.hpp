@@ -39,4 +39,4 @@ ndarray<T> div(const ndarray<T>& A, const ndarray<T>& B) {
     return C;
 }
 
-} // namespace numbits
+} // namespace nb
