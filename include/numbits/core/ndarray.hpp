@@ -72,7 +72,7 @@ private:
     std::vector<T> data_;
 
     void validate_2d_access(size_t i, size_t j) const {
-        if (shape_.size() < 2)
+        if (shape_.size() != 2)
             throw std::logic_error("ndarray: invalid 2D access on non-2D array");
         if (i >= shape_[0] || j >= shape_[1])
             throw std::out_of_range("ndarray: index out of bounds");
