@@ -1,14 +1,20 @@
 cmake_minimum_required(VERSION 3.14)
-project(NumBits VERSION 0.1 LANGUAGES CXX)
+project(NumBits LANGUAGES CXX VERSION 0.1.0)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-include_directories(include)
+option(NUMBITS_BUILD_TESTS "Build NumBits tests" ON)
+option(NUMBITS_BUILD_EXAMPLES "Build NumBits examples" ON)
 
 add_library(numbits INTERFACE)
-target_include_directories(numbits INTERFACE include)
+target_include_directories(numbits INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_executable(example examples/example_basic.cpp)
-target_link_libraries(example PRIVATE numbits)
+if(NUMBITS_BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()
+
+if(NUMBITS_BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
