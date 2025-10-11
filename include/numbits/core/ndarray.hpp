@@ -6,6 +6,7 @@
 #include <numeric>
 #include <functional>
 #include <algorithm>
+#include <type_traits>
 
 namespace numbits {
 
