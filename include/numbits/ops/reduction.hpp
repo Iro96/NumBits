@@ -1,17 +1,18 @@
 #pragma once
 #include "../core/ndarray.hpp"
-#include <numeric>
 
-namespace nb {
+namespace numbits {
 
-template<typename T>
-T sum(const ndarray<T>& a) {
-    return std::accumulate(a.data().begin(), a.data().end(), T(0));
+template <typename T>
+T sum(const ndarray<T>& A) {
+    T s = 0;
+    for (auto& v : A.data()) s += v;
+    return s;
 }
 
-template<typename T>
-double mean(const ndarray<T>& a) {
-    return static_cast<double>(sum(a)) / static_cast<double>(a.size());
+template <typename T>
+T mean(const ndarray<T>& A) {
+    return sum(A) / static_cast<T>(A.size());
 }
 
 } // namespace nb
