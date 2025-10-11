@@ -1,7 +1,15 @@
+<div align="center">
+  
 # NumBits
+
+NumBits is a lightweight C++ numerical computing library inspired by NumPy. It provides multidimensional arrays (`ndarray<T>`), basic arithmetic operations, reductions, linear algebra, random number generation, and statistical functions.
 
 [![CMake on multiple platforms](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml/badge.svg?branch=main)](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+</div>
+
+---
 
 ## NumBits Development Plan (v0.1 → v1.0+)
 
@@ -18,3 +26,76 @@
 | 🔜 **v0.9**  | GPU Backend          | CUDA / OpenCL / Vulkan         | GPU-enabled ndarray backend                                          |
 | 🔜 **v1.0**  | Python API           | `import numbits` via pybind11  | Expose C++ API to Python for hybrid workflows                        |
 | 🌟 **v1.1+** | AI / Autograd        | Differentiation engine         | Automatic gradients, neural ops, backpropagation                     |
+
+---
+
+## How To Use
+
+### Example
+
+```cpp
+#include <iostream>
+#include "numbits/core/ndarray.hpp"
+#include "numbits/ops/arithmetic.hpp"
+#include "numbits/ops/reduction.hpp"
+#include "numbits/linalg/matrix.hpp"
+#include "numbits/math/math.hpp"
+#include "numbits/stats/statistics.hpp"
+#include "numbits/random/generator.hpp"
+
+int main() {
+    using namespace numbits;
+
+    std::cout << "=== NumBits v0.1 Full Example ===\n\n";
+
+    // 1. Create arrays
+    ndarray<double> A({2, 3}, 2.0);       // 2x3 filled with 2.0
+    ndarray<double> B = rand<double>({2, 3});  // uniform random
+    ndarray<double> C = randn<double>({2, 3}); // normal random
+
+    std::cout << "Array A:\n" << A << "\n";
+    std::cout << "Array B (uniform):\n" << B << "\n";
+    std::cout << "Array C (normal):\n" << C << "\n";
+
+    // 2. Elementwise arithmetic
+    auto D = add(A, B);
+    auto E = sub(B, C);
+    auto F = mul(A, B);
+    auto G = div(B, A);
+
+    std::cout << "D = A + B:\n" << D << "\n";
+    std::cout << "E = B - C:\n" << E << "\n";
+    std::cout << "F = A * B:\n" << F << "\n";
+    std::cout << "G = B / A:\n" << G << "\n";
+
+    // 3. Linear algebra (dot product)
+    ndarray<double> X({2, 3}, 1.0);
+    ndarray<double> Y({3, 2}, 2.0);
+    auto Z = dot(X, Y);
+
+    std::cout << "Z = X dot Y:\n" << Z << "\n";
+
+    // 4. Math functions (elementwise)
+    auto H = exp(B);
+    auto I = sqrt(C * C + 1.0);  // just to ensure positive input for sqrt
+
+    std::cout << "H = exp(B):\n" << H << "\n";
+    std::cout << "I = sqrt(C^2 + 1):\n" << I << "\n";
+
+    // 5. Reductions
+    std::cout << "sum(B) = " << sum(B) << "\n";
+    std::cout << "mean(B) = " << mean(B) << "\n";
+    std::cout << "variance(B) = " << variance(B) << "\n";
+    std::cout << "stddev(B) = " << stddev(B) << "\n";
+
+    // 6. Random arrays
+    auto U = rand<double>({3, 3});
+    auto N = randn<double>({3, 3});
+
+    std::cout << "U (uniform 3x3):\n" << U << "\n";
+    std::cout << "N (normal 3x3):\n" << N << "\n";
+
+    return 0;
+}
+
+```
