@@ -1,5 +1,7 @@
 #pragma once
-#pragma once
+#include <vector>
+#include <numeric>
+#include <functional>
 #include <vector>
 #include <numeric>
 #include <functional>
