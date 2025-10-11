@@ -3,37 +3,50 @@
 #include "../ops/reduction.hpp"  // for mean()
 #include <cmath>
 #include <type_traits>
+#include <stdexcept>
 
 namespace numbits {
 
 /**
  * @brief Compute the variance of elements in an ndarray.
  *
- * @tparam T Numeric type (usually float or double)
+ * Returns the population variance (not sample variance).
+ * Always returns double for precision, even if T is integral.
+ *
+ * @tparam T Arithmetic type (integer or floating-point)
  * @param A Input ndarray
- * @return Variance of all elements
+ * @return double Variance of elements
+ * @throws std::invalid_argument if A is empty
  */
 template <typename T>
-T variance(const ndarray<T>& A) {
-    static_assert(std::is_arithmetic_v<T>, "variance requires a numeric type");
+double variance(const ndarray<T>& A) {
+    static_assert(std::is_arithmetic_v<T>, "numbits::variance requires numeric T");
 
-    T m = mean(A);
-    T var = 0;
-    for (const auto& x : A.data())
-        var += (x - m) * (x - m);
-    return var / static_cast<T>(A.size());
+    const auto count = A.size();
+    if (count == 0)
+        throw std::invalid_argument("variance: ndarray must contain at least one element");
+
+    const double m = static_cast<double>(mean(A));
+    double var = 0.0;
+    for (const auto& x : A.data()) {
+        const double d = static_cast<double>(x) - m;
+        var += d * d;
+    }
+    return var / static_cast<double>(count);
 }
 
 /**
- * @brief Compute the standard deviation of an ndarray.
+ * @brief Compute the standard deviation of elements in an ndarray.
  *
- * @tparam T Numeric type (usually float or double)
+ * Returns double precision regardless of input type.
+ *
+ * @tparam T Arithmetic type
  * @param A Input ndarray
- * @return Standard deviation
+ * @return double Standard deviation
  */
 template <typename T>
-T stddev(const ndarray<T>& A) {
-    return std::sqrt(variance(A));
+double stddev(const ndarray<T>& A) {
+    return std::sqrt(variance<T>(A));
 }
 
 } // namespace numbits
