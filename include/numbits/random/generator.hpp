@@ -21,9 +21,10 @@ ndarray<T> rand(const std::initializer_list<size_t>& shape) {
     if (shape.size() == 0)
         throw std::invalid_argument("rand: shape cannot be empty");
 
+    // Use a thread-local RNG to avoid recreation cost
+    static thread_local std::mt19937 gen(std::random_device{}());
+
     ndarray<T> A(shape);
-    std::random_device rd;
-    std::mt19937 gen(rd());
     std::uniform_real_distribution<T> dist(static_cast<T>(0.0), static_cast<T>(1.0));
 
     for (auto& v : A.data())
@@ -38,8 +39,9 @@ ndarray<T> rand(const std::initializer_list<size_t>& shape) {
  * @tparam T Floating-point type.
  * @param shape Shape of the output array.
  * @param mean Mean of the distribution.
- * @param stddev Standard deviation of the distribution.
+ * @param stddev Standard deviation of the distribution (must be > 0).
  * @return ndarray<T> filled with Gaussian random numbers.
+ * @throws std::invalid_argument if shape is empty or stddev <= 0.
  */
 template <typename T = double>
 ndarray<T> randn(const std::initializer_list<size_t>& shape,
@@ -50,10 +52,13 @@ ndarray<T> randn(const std::initializer_list<size_t>& shape,
 
     if (shape.size() == 0)
         throw std::invalid_argument("randn: shape cannot be empty");
+    if (stddev <= static_cast<T>(0))
+        throw std::invalid_argument("randn: stddev must be > 0");
+
+    // Use a thread-local RNG to avoid reseeding every call
+    static thread_local std::mt19937 gen(std::random_device{}());
 
     ndarray<T> A(shape);
-    std::random_device rd;
-    std::mt19937 gen(rd());
     std::normal_distribution<T> dist(mean, stddev);
 
     for (auto& v : A.data())
