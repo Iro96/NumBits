@@ -4,6 +4,14 @@
 
 namespace numbits {
 
+/**
+ * @brief Matrix multiplication (dot product) for 2D ndarrays.
+ * 
+ * Computes: C = A × B
+ * where A is (n × p) and B is (p × m)
+ * 
+ * @throws std::invalid_argument if input arrays are not 2D or have mismatched inner dimensions.
+ */
 template <typename T>
 ndarray<T> dot(const ndarray<T>& A, const ndarray<T>& B) {
     const auto& sA = A.shape();
@@ -22,9 +30,10 @@ ndarray<T> dot(const ndarray<T>& A, const ndarray<T>& B) {
     if (p != q)
         throw std::invalid_argument("dot: inner dimensions must match");
 
-    // Type-safe zero initialization
+    // Initialize output matrix with zeros
     ndarray<T> C({n, m}, T{});
 
+    // Standard triple-nested loop (can later optimize with OpenMP or BLAS)
     for (size_t i = 0; i < n; ++i)
         for (size_t j = 0; j < m; ++j)
             for (size_t k = 0; k < p; ++k)
