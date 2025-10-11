@@ -79,4 +79,4 @@ private:
     }
 };
 
-}  // namespace nb
+}  // namespace numbits
