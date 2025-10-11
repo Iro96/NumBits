@@ -1,6 +1,6 @@
 #pragma once
 #include "../core/ndarray.hpp"
-#include "../ops/reduction.hpp"
+#include "../core/utils.hpp"    // for mean
 #include <cmath>
 
 namespace numbits {
