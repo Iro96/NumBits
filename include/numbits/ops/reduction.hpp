@@ -21,6 +21,7 @@ T sum(const ndarray<T>& A) {
 
 /**
  * @brief Compute mean of all elements in an ndarray.
+ *        Always returns double for precision safety.
  * @throws std::domain_error if A.size() == 0
  */
 template <typename T>
@@ -32,6 +33,20 @@ double mean(const ndarray<T>& A) {
 
     return static_cast<double>(sum(A)) /
            static_cast<double>(A.size());
+}
+
+/**
+ * @brief Compute mean of all elements in an ndarray, truncating to integer result.
+ *        Useful only when truncation is explicitly desired.
+ * @note Performs integer division (truncates fractional part).
+ */
+template <typename T>
+std::enable_if_t<std::is_integral_v<T>, T>
+mean_truncated(const ndarray<T>& A) {
+    if (A.size() == 0)
+        throw std::domain_error("mean_truncated: cannot compute mean of empty ndarray");
+
+    return sum(A) / static_cast<T>(A.size()); // integer division
 }
 
 } // namespace numbits
