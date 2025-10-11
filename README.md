@@ -1,6 +1,7 @@
 # NumBits
 
-[![CMake Passing](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml)
+[![CMake on multiple platforms](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml/badge.svg?branch=main)](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## NumBits Development Plan (v0.1 → v1.0+)
 
