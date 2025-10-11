@@ -1,5 +1,7 @@
 # NumBits
 
+[![CMake Passing](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml)
+
 ## NumBits Development Plan (v0.1 → v1.0+)
 
 | Version      | Stage                | Focus                          | Description                                                          |
