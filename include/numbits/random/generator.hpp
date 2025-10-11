@@ -14,10 +14,18 @@ namespace detail {
  * - No global state (safe for concurrent threads).
  * - RNG engine constructed only once per thread.
  */
-inline thread_local std::mt19937& global_rng() {
+inline std::mt19937& global_rng() {
     static thread_local std::mt19937 gen(std::random_device{}());
     return gen;
 }
+
+/**
+ * @brief Optional helper to seed the thread-local RNG (useful for reproducible tests)
+ */
+inline void seed_rng(unsigned int seed) {
+    global_rng().seed(seed);
+}
+
 } // namespace detail
 
 /**
