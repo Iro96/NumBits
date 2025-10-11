@@ -2,6 +2,7 @@
 #include "../core/ndarray.hpp"
 #include <stdexcept>
 #include <type_traits>
+#include <limits>
 
 namespace numbits {
 
@@ -37,8 +38,14 @@ double mean(const ndarray<T>& A) {
 
 /**
  * @brief Compute mean of all elements in an ndarray, truncating to integer result.
- *        Useful only when truncation is explicitly desired.
- * @note Performs integer division (truncates fractional part).
+ *
+ * Performs integer division (truncates fractional part).  
+ * Uses a widened accumulator to prevent overflow, and checks
+ * that the result fits into T before narrowing.
+ *
+ * @tparam T Integral type.
+ * @throws std::domain_error if A.size() == 0
+ * @throws std::overflow_error if the mean cannot fit into T
  */
 template <typename T>
 std::enable_if_t<std::is_integral_v<T>, T>
@@ -46,7 +53,23 @@ mean_truncated(const ndarray<T>& A) {
     if (A.size() == 0)
         throw std::domain_error("mean_truncated: cannot compute mean of empty ndarray");
 
-    return sum(A) / static_cast<T>(A.size()); // integer division
+    using Wide = long long;  // wide enough for most integer accumulation
+    static_assert(std::numeric_limits<Wide>::digits >= std::numeric_limits<T>::digits,
+                  "mean_truncated: accumulator type too small");
+
+    Wide total = 0;
+    for (const auto& v : A.data())
+        total += static_cast<Wide>(v);
+
+    Wide divisor = static_cast<Wide>(A.size());
+    Wide quotient = total / divisor;
+
+    if (quotient > static_cast<Wide>(std::numeric_limits<T>::max()) ||
+        quotient < static_cast<Wide>(std::numeric_limits<T>::min())) {
+        throw std::overflow_error("mean_truncated: result out of range for target type");
+    }
+
+    return static_cast<T>(quotient);
 }
 
 } // namespace numbits
