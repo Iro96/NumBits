@@ -1,6 +1,7 @@
 #pragma once
 #include "../core/ndarray.hpp"
 #include <random>
+#include <stdexcept>
 #include <type_traits>
 
 namespace numbits {
