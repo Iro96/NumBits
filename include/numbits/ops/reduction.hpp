@@ -24,13 +24,14 @@ T sum(const ndarray<T>& A) {
  * @throws std::domain_error if A.size() == 0
  */
 template <typename T>
-T mean(const ndarray<T>& A) {
+double mean(const ndarray<T>& A) {
     static_assert(std::is_arithmetic_v<T>, "numbits::mean requires arithmetic T");
 
     if (A.size() == 0)
         throw std::domain_error("mean: cannot compute mean of empty ndarray");
 
-    return sum(A) / static_cast<T>(A.size());
+    return static_cast<double>(sum(A)) /
+           static_cast<double>(A.size());
 }
 
 } // namespace numbits
