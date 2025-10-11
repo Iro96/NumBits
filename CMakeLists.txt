@@ -10,12 +10,11 @@ option(NUMBITS_BUILD_EXAMPLES "Build NumBits examples" ON)
 add_library(numbits INTERFACE)
 target_include_directories(numbits INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# Only enable tests/examples if directories exist
-if(NUMBITS_BUILD_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
+if(NUMBITS_BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
 endif()
 
-if(NUMBITS_BUILD_EXAMPLES AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/examples/CMakeLists.txt")
+if(NUMBITS_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
