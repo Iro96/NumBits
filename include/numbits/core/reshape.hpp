@@ -86,7 +86,7 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>
             throw std::invalid_argument("broadcast_to: incompatible shapes");
     }
 
-    ndarray<T> B(new_shape);
+    ndarray<T> B({new_shape.begin(), new_shape.end()});
     const auto& src = A.data();
     auto& dst = B.data();
     for (size_t idx = 0; idx < B.size(); ++idx)
