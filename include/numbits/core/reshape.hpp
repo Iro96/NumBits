@@ -10,22 +10,20 @@ namespace numbits {
  * @brief Reshape an ndarray to a new shape without copying data.
  * @param A Input array
  * @param new_shape Desired shape (total size must match)
- * @return New ndarray sharing the same data
+ * @return ndarray<T> sharing the same underlying data
  */
 template <typename T>
 ndarray<T> reshape(const ndarray<T>& A, const std::initializer_list<size_t>& new_shape) {
     size_t old_size = A.size();
     size_t new_size = std::accumulate(new_shape.begin(), new_shape.end(), size_t{1}, std::multiplies<size_t>());
-    if (old_size != new_size) {
+    if (old_size != new_size)
         throw std::invalid_argument("reshape: total size must remain the same");
-    }
 
-    std::vector<size_t> shape_vec(new_shape);
-    return ndarray<T>(shape_vec, A.data_ptr());
+    return ndarray<T>(std::vector<size_t>(new_shape), A.data_ptr());
 }
 
 /**
- * @brief Insert a new axis of size 1 at the specified position
+ * @brief Insert a new axis of size 1 at the specified position.
  */
 template <typename T>
 ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
@@ -37,7 +35,7 @@ ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
 }
 
 /**
- * @brief Remove axes of size 1. If axis >= 0, remove only that axis
+ * @brief Remove axes of size 1. If axis >= 0, remove only that axis.
  */
 template <typename T>
 ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
@@ -55,7 +53,7 @@ ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
 }
 
 /**
- * @brief Transpose a 2D array
+ * @brief Transpose a 2D array (swap rows and columns).
  */
 template <typename T>
 ndarray<T> transpose(const ndarray<T>& A) {
@@ -67,11 +65,12 @@ ndarray<T> transpose(const ndarray<T>& A) {
     for (size_t i = 0; i < shape[0]; ++i)
         for (size_t j = 0; j < shape[1]; ++j)
             B(j, i) = A(i, j);
+
     return B;
 }
 
 /**
- * @brief Broadcast array to a new shape (size-1 axes can expand)
+ * @brief Broadcast array to a new shape (size-1 axes can expand).
  */
 template <typename T>
 ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>& target_shape) {
@@ -88,16 +87,16 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>
     }
 
     ndarray<T> B(new_shape);
-    size_t total = B.size();
-    const std::vector<T>& src = A.data();
-    std::vector<T>& dst = B.data();
-    for (size_t idx = 0; idx < total; ++idx)
+    const auto& src = A.data();
+    auto& dst = B.data();
+    for (size_t idx = 0; idx < B.size(); ++idx)
         dst[idx] = src[idx % A.size()];
+
     return B;
 }
 
 /**
- * @brief Slice a 2D array by row/col ranges
+ * @brief Slice a 2D array by row/column ranges (start inclusive, end exclusive).
  */
 template <typename T>
 ndarray<T> slice(const ndarray<T>& A, size_t row_start, size_t row_end, size_t col_start, size_t col_end) {
@@ -113,6 +112,7 @@ ndarray<T> slice(const ndarray<T>& A, size_t row_start, size_t row_end, size_t c
     for (size_t i = 0; i < rows; ++i)
         for (size_t j = 0; j < cols; ++j)
             B(i, j) = A(i + row_start, j + col_start);
+
     return B;
 }
 
