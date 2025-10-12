@@ -33,6 +33,13 @@ NumBits is a lightweight C++ numerical computing library inspired by NumPy. It p
 
 ### How to compile
 
+#### Clone the repository
+
+```bah
+git clone https://github.com/Iro96/NumBits.git
+cd ./NumBits
+```
+
 #### Windows
 
 ```bash
