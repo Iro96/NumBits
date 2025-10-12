@@ -4,6 +4,11 @@
 
 using namespace numbits;
 
+/**
+ * @brief Runs a self-contained example that creates two random 2x3 tensors, computes their element-wise sum, exercises additional tensor operations (reshape, transpose, expand_dims, squeeze, broadcast_to, slice), and prints each tensor to standard output.
+ *
+ * @return int 0 on success.
+ */
 int main() {
     auto A = rand<double>({2, 3});
     auto B = rand<double>({2, 3});

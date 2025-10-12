@@ -13,6 +13,15 @@ namespace numbits {
  * @return ndarray<T> sharing the same underlying data
  */
 template <typename T>
+/**
+ * Reshape an ndarray to a new shape without copying its underlying data.
+ *
+ * @param A Source array whose data buffer will be shared by the result.
+ * @param new_shape Desired shape; each dimension must be greater than 0 and the product of dimensions must equal the number of elements in `A`.
+ * @return ndarray<T> A new array view with shape `new_shape` that shares `A`'s underlying data pointer.
+ *
+ * @throws std::invalid_argument If `new_shape` is empty, any dimension is 0, or the total number of elements differs from `A`.
+ */
 ndarray<T> reshape(const ndarray<T>& A, const std::vector<size_t>& new_shape) {
     if (new_shape.empty())
         throw std::invalid_argument("reshape: shape cannot be empty");
@@ -30,6 +39,18 @@ ndarray<T> reshape(const ndarray<T>& A, const std::vector<size_t>& new_shape) {
  * @brief Overload: Accept initializer_list as new shape
  */
 template <typename T>
+/**
+ * @brief Create a view of `A` with the specified shape, sharing the same underlying data.
+ *
+ * The new shape must be non-empty, all dimensions must be greater than zero, and the
+ * product of the dimensions must equal the number of elements in `A`.
+ *
+ * @param A Source array to reshape.
+ * @param new_shape Desired shape as an initializer list.
+ * @return ndarray<T> View of `A` with shape `new_shape` that shares `A`'s data.
+ * @throws std::invalid_argument If `new_shape` is empty, contains zero dimensions,
+ *         or its element count does not match `A`'s total elements.
+ */
 ndarray<T> reshape(const ndarray<T>& A, const std::initializer_list<size_t>& new_shape) {
     return reshape(A, std::vector<size_t>(new_shape));
 }
@@ -38,6 +59,13 @@ ndarray<T> reshape(const ndarray<T>& A, const std::initializer_list<size_t>& new
  * @brief Insert a new axis of size 1 at the specified position.
  */
 template <typename T>
+/**
+ * @brief Insert a new axis of length 1 into the array's shape at the specified position.
+ *
+ * @param axis Index at which to insert the new axis. Valid values are 0 through the array's current rank (inclusive).
+ * @return ndarray<T> A view of the original array with the new axis inserted; shares the same underlying data.
+ * @throws std::invalid_argument if `axis` is greater than the array's current rank.
+ */
 ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
     std::vector<size_t> new_shape = A.shape();
     if (axis > new_shape.size())
@@ -50,6 +78,21 @@ ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
  * @brief Remove axes of size 1. If axis >= 0, remove only that axis.
  */
 template <typename T>
+/**
+ * @brief Remove singleton dimensions from an ndarray, optionally at a specific axis.
+ *
+ * If `axis` is non-negative, removes the dimension at that index only and requires that
+ * the targeted dimension has size 1. If `axis` is negative (default -1), removes all
+ * dimensions with size 1.
+ *
+ * @tparam T Element type of the ndarray.
+ * @param axis Index of the axis to remove, or -1 to remove all size-1 axes. Axis is
+ *        interpreted as a zero-based index and must be in range [0, ndim-1] when non-negative.
+ * @return ndarray<T> New view with the specified singleton dimensions removed that shares
+ *         the original array's underlying data pointer.
+ * @throws std::invalid_argument if `axis` is out of bounds.
+ * @throws std::invalid_argument if `axis` is non-negative and the selected axis has size != 1.
+ */
 ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
     std::vector<size_t> new_shape = A.shape();
     if (axis >= 0) {
@@ -68,6 +111,13 @@ ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
  * @brief Transpose a 2D array (swap rows and columns).
  */
 template <typename T>
+/**
+ * @brief Transpose a 2D array by swapping its rows and columns.
+ *
+ * @param A Input array; must have exactly 2 dimensions.
+ * @return ndarray<T> A new array with shape {original_cols, original_rows} containing the transposed elements.
+ * @throws std::invalid_argument if `A` does not have exactly 2 dimensions.
+ */
 ndarray<T> transpose(const ndarray<T>& A) {
     const auto& shape = A.shape();
     if (shape.size() != 2)
@@ -85,6 +135,23 @@ ndarray<T> transpose(const ndarray<T>& A) {
  * @brief Broadcast array to a new shape (size-1 axes can expand).
  */
 template <typename T>
+/**
+ * @brief Broadcasts an array to a larger shape by expanding singleton dimensions.
+ *
+ * Creates and returns a new array whose shape equals `target_shape` where each
+ * dimension of `A` is either equal to the corresponding (right-aligned) target
+ * dimension or equal to 1 and therefore replicated across that axis.
+ *
+ * @tparam T Element type of the array.
+ * @param A Source array to broadcast.
+ * @param target_shape Desired shape to broadcast `A` to; must have at least as
+ * many dimensions as `A`.
+ * @return ndarray<T> A new array with shape `target_shape` containing values
+ * copied from `A` according to broadcasting rules.
+ * @throws std::invalid_argument If `target_shape` has fewer dimensions than
+ * `A`, or if any non-singleton dimension of `A` is incompatible with the
+ * corresponding target dimension.
+ */
 ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_shape) {
     const auto& orig_shape = A.shape();
     std::vector<size_t> new_shape = target_shape;
@@ -136,6 +203,16 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
 
 /** Overload for initializer_list */
 template <typename T>
+/**
+ * @brief Broadcasts an array to the specified target shape given as an initializer list.
+ *
+ * The returned array shares values from the original array broadcast across any
+ * dimensions of size 1 or matching dimensions in the target shape.
+ *
+ * @param target_shape Desired shape to broadcast to.
+ * @return ndarray<T> Array with shape equal to `target_shape` containing the broadcasted values.
+ * @throws std::invalid_argument if `target_shape` is not compatible with the source array's shape.
+ */
 ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>& target_shape) {
     return broadcast_to(A, std::vector<size_t>(target_shape));
 }
@@ -144,6 +221,20 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>
  * @brief Slice a 2D array by row/column ranges (start inclusive, end exclusive).
  */
 template <typename T>
+/**
+ * @brief Extracts a 2D subarray from the given array using half-open row and column ranges.
+ *
+ * The slice includes rows in [row_start, row_end) and columns in [col_start, col_end).
+ *
+ * @param row_start Start row index (inclusive).
+ * @param row_end End row index (exclusive).
+ * @param col_start Start column index (inclusive).
+ * @param col_end End column index (exclusive).
+ * @return ndarray<T> A new 2D array containing the requested slice.
+ *
+ * @throws std::invalid_argument if the input is not 2D or if any start index is greater than its corresponding end index.
+ * @throws std::out_of_range if any index is outside the bounds of the input array.
+ */
 ndarray<T> slice(const ndarray<T>& A, size_t row_start, size_t row_end, size_t col_start, size_t col_end) {
     const auto& shape = A.shape();
     if (shape.size() != 2)

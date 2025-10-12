@@ -4,6 +4,16 @@
 
 using namespace numbits;
 
+/**
+ * @brief Runs a suite of basic ndarray operation tests.
+ *
+ * Executes a sequence of self-checks that validate arithmetic (addition and sum),
+ * reshaping, transposition, dimension expansion, and broadcasting for ndarray<int>.
+ * Each step uses assertions to verify shapes and values; on successful completion
+ * the function prints a success message.
+ *
+ * @return int Exit status code: `0` when all tests pass and the program completes normally.
+ */
 int main() {
     // --- Arithmetic test ---
     ndarray<int> A({2, 3}, 2);
