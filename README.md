@@ -31,7 +31,16 @@ NumBits is a lightweight C++ numerical computing library inspired by NumPy. It p
 
 ## How To Use
 
-### Example (v0.2)
+### How to compile
+
+#### Windows
+
+```bash
+g++ path_to_your_file.cpp -o path_to_your_output -I"d:\NumBits\include" -std=c++20
+path_to_your_output
+```
+
+### Example code (v0.2)
 
 ```cpp
 #include <iostream>
