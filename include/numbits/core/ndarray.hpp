@@ -33,6 +33,8 @@ public:
     explicit ndarray(std::initializer_list<size_t> shape, T init = T()) {
         if (shape.size() == 0)
             throw std::invalid_argument("ndarray: shape cannot be empty");
+        if (std::any_of(shape.begin(), shape.end(), [](size_t d){ return d == 0; }))
+            throw std::invalid_argument("ndarray: shape dimensions must be > 0");
 
         shape_.assign(shape.begin(), shape.end());
         const size_t total = std::accumulate(
