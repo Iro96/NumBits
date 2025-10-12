@@ -4,6 +4,15 @@
 
 using namespace numbits;
 
+/**
+ * @brief Demonstrates basic numbits tensor operations and prints each result to stdout.
+ *
+ * Creates two random 2x3 tensors A and B, computes their element-wise sum C, and prints A, B, and C.
+ * Then performs additional operations on those tensors — reshape, transpose, expand_dims, squeeze,
+ * broadcast_to, and slice — printing the result of each operation.
+ *
+ * @return int Exit code (0 on success).
+ */
 int main() {
     auto A = rand<double>({2, 3});
     auto B = rand<double>({2, 3});
