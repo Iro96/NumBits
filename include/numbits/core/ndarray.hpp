@@ -59,18 +59,22 @@ public:
     }
 
     /**
-     ndarray(const std::vector<size_t>& shape, std::shared_ptr<std::vector<T>> data_ptr)
-         : shape_(shape), data_(std::move(data_ptr)) {
-         if (!data_)
-             throw std::invalid_argument("ndarray: data_ptr cannot be null");
-         const size_t expected = std::accumulate(shape_.begin(), shape_.end(), size_t{1}, std::multiplies<size_t>());
-         if (data_->size() != expected)
-             throw std::invalid_argument("ndarray: data size does not match shape");
-     }
-     * @param data_ptr Shared pointer to existing data
+     * @brief Construct ndarray from shape and shared data pointer.
+     * @param shape Shape vector (must be non-empty and dimensions > 0)
+     * @param data_ptr Shared pointer to existing data (must be non-null and size must match shape)
      */
     ndarray(const std::vector<size_t>& shape, std::shared_ptr<std::vector<T>> data_ptr)
-        : shape_(shape), data_(data_ptr) {}
+        : shape_(shape), data_(std::move(data_ptr)) {
+        if (shape_.empty())
+            throw std::invalid_argument("ndarray: shape cannot be empty");
+        if (std::any_of(shape_.begin(), shape_.end(), [](size_t d){ return d == 0; }))
+            throw std::invalid_argument("ndarray: shape dimensions must be > 0");
+        if (!data_)
+            throw std::invalid_argument("ndarray: data_ptr cannot be null");
+        const size_t expected = std::accumulate(shape_.begin(), shape_.end(), size_t{1}, std::multiplies<size_t>());
+        if (data_->size() != expected)
+            throw std::invalid_argument("ndarray: data size does not match shape");
+    }
 
     // ---------------- Accessors ----------------
 
