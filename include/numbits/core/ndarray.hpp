@@ -23,7 +23,8 @@ public:
     // ---------------- Constructors ----------------
 
     /** Default constructor */
-    ndarray() = default;
+    ndarray()
+        : data_(std::make_shared<std::vector<T>>()) {}
 
     /**
      * @brief Construct ndarray from initializer_list (e.g., {2,3})
