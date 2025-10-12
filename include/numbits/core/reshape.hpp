@@ -97,8 +97,37 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
     ndarray<T> B(new_shape);
     const auto& src = A.data();
     auto& dst = B.data();
-    for (size_t idx = 0; idx < B.size(); ++idx)
-        dst[idx] = src[idx % A.size()];
+
+    // Prepare aligned shapes
+    std::vector<size_t> src_shape = A.shape();
+    std::vector<size_t> dst_shape = B.shape();
+    size_t ndim_dst = dst_shape.size();
+    size_t ndim_src = src_shape.size();
+    size_t offset = ndim_dst - ndim_src;
+
+    // Compute strides for source in row-major
+    std::vector<size_t> src_strides(ndim_src, 1);
+    for (int i = int(ndim_src) - 2; i >= 0; --i)
+        src_strides[i] = src_strides[i + 1] * src_shape[i + 1];
+
+    for (size_t idx = 0; idx < B.size(); ++idx) {
+        // Unravel idx into dst indices
+        size_t rem = idx;
+        size_t src_flat = 0;
+        for (size_t k = 0; k < ndim_dst; ++k) {
+            size_t dim = dst_shape[ndim_dst - 1 - k];
+            size_t coord = rem % dim;
+            rem /= dim;
+            // Map to source axis if exists
+            if (ndim_dst - 1 - k >= offset) {
+                size_t s_axis = (ndim_dst - 1 - k) - offset;
+                size_t s_dim = src_shape[s_axis];
+                size_t s_coord = (s_dim == 1) ? 0 : coord;
+                src_flat += s_coord * src_strides[s_axis];
+            }
+        }
+        dst[idx] = src[src_flat];
+    }
 
     return B;
 }
