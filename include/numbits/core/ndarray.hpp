@@ -20,12 +20,15 @@ namespace numbits {
 template <typename T>
 class ndarray {
 public:
+    // ---------------- Constructors ----------------
+
+    /** Default constructor */
     ndarray() = default;
 
     /**
-     * @brief Construct an ndarray with given shape and optional initial value.
-     * @param shape List of dimension sizes (cannot be empty).
-     * @param init Initial value for all elements (default T()).
+     * @brief Construct ndarray from initializer_list (e.g., {2,3})
+     * @param shape List of dimensions (cannot be empty)
+     * @param init Initial value for all elements (default T())
      */
     explicit ndarray(std::initializer_list<size_t> shape, T init = T()) {
         if (shape.size() == 0)
@@ -33,15 +36,33 @@ public:
 
         shape_.assign(shape.begin(), shape.end());
         const size_t total = std::accumulate(
-            shape_.begin(), shape_.end(), static_cast<size_t>(1), std::multiplies<size_t>());
+            shape_.begin(), shape_.end(), size_t{1}, std::multiplies<size_t>());
         data_ = std::make_shared<std::vector<T>>(total, init);
     }
 
     /**
-     * @brief Construct ndarray with existing shared data (used internally for reshape / views)
+     * @brief Construct ndarray from std::vector<size_t> shape
+     * @param shape Vector of dimensions (cannot be empty)
+     * @param init Initial value for all elements (default T())
+     */
+    explicit ndarray(const std::vector<size_t>& shape, T init = T()) {
+        if (shape.empty())
+            throw std::invalid_argument("ndarray: shape cannot be empty");
+
+        shape_ = shape;
+        size_t total = std::accumulate(shape.begin(), shape.end(), size_t{1}, std::multiplies<size_t>());
+        data_ = std::make_shared<std::vector<T>>(total, init);
+    }
+
+    /**
+     * @brief Construct ndarray with existing shared data (used for reshape/views)
+     * @param shape Vector of dimensions
+     * @param data_ptr Shared pointer to existing data
      */
     ndarray(const std::vector<size_t>& shape, std::shared_ptr<std::vector<T>> data_ptr)
         : shape_(shape), data_(data_ptr) {}
+
+    // ---------------- Accessors ----------------
 
     /** @return Shape of the array */
     const std::vector<size_t>& shape() const noexcept { return shape_; }
@@ -49,7 +70,7 @@ public:
     /** @return Total number of elements */
     size_t size() const noexcept { return data_->size(); }
 
-    // --- 2D Safe Access ---
+    /** 2D element access (safe) */
     T& operator()(size_t i, size_t j) {
         validate_2d_access(i, j);
         return (*data_)[i * shape_[1] + j];
@@ -64,7 +85,7 @@ public:
     std::vector<T>& data() noexcept { return *data_; }
     const std::vector<T>& data() const noexcept { return *data_; }
 
-    /** @return Shared pointer to underlying data (for views / reshape) */
+    /** @return Shared pointer to underlying data */
     std::shared_ptr<std::vector<T>> data_ptr() const noexcept { return data_; }
 
     /** Fill all elements with a value */
@@ -72,7 +93,7 @@ public:
         std::fill(data_->begin(), data_->end(), value);
     }
 
-    /** Pretty-print 2D arrays; for others, just show shape */
+    /** Pretty-print 2D arrays; for others, show shape */
     friend std::ostream& operator<<(std::ostream& os, const ndarray& arr) {
         if (arr.shape_.size() != 2) {
             os << "ndarray(shape=(";
@@ -81,6 +102,7 @@ public:
             os << "))";
             return os;
         }
+
         const size_t rows = arr.shape_[0];
         const size_t cols = arr.shape_[1];
         for (size_t i = 0; i < rows; ++i) {
