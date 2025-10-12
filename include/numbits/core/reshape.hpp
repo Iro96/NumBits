@@ -107,7 +107,7 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
     std::vector<size_t> dst_shape = B.shape();
     size_t ndim_dst = dst_shape.size();
     size_t ndim_src = src_shape.size();
-    size_t offset = ndim_dst - ndim_src;
+    // reuse existing offset (ndim_dst - ndim_src is equal to new_shape.size() - orig_shape.size())
 
     // Compute strides for source in row-major
     std::vector<size_t> src_strides(ndim_src, 1);
