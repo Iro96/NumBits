@@ -86,6 +86,11 @@ ndarray<T> transpose(const ndarray<T>& A) {
  */
 template <typename T>
 ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_shape) {
+    if (target_shape.empty())
+        throw std::invalid_argument("broadcast_to: target shape cannot be empty");
+    if (std::any_of(target_shape.begin(), target_shape.end(), [](size_t d){ return d == 0; }))
+        throw std::invalid_argument("broadcast_to: shape dimensions must be > 0");
+
     const auto& orig_shape = A.shape();
     std::vector<size_t> new_shape = target_shape;
 
