@@ -219,8 +219,6 @@ public:
 
 private:
     std::vector<size_t> shape_;
-private:
-    std::vector<size_t> shape_;
     std::shared_ptr<std::vector<T>> data_;
 
     /**
@@ -232,9 +230,6 @@ private:
      * @throws std::logic_error if the array shape does not represent a 2D tensor.
      * @throws std::out_of_range if `i` or `j` is outside the valid range for their respective dimension.
      */
-    void validate_2d_access(size_t i, size_t j) const {
-        // ...
-    }
 
     void validate_2d_access(size_t i, size_t j) const {
         if (shape_.size() != 2)
