@@ -58,8 +58,10 @@ ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
         if (new_shape[axis] != 1)
             throw std::invalid_argument("squeeze: cannot squeeze axis with size != 1");
         new_shape.erase(new_shape.begin() + axis);
+        if (new_shape.empty()) new_shape.push_back(1);
     } else {
         new_shape.erase(std::remove(new_shape.begin(), new_shape.end(), 1), new_shape.end());
+        if (new_shape.empty()) new_shape.push_back(1);
     }
     return ndarray<T>(new_shape, A.data_ptr());
 }
