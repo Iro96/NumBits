@@ -146,7 +146,9 @@ ndarray<T> slice(const ndarray<T>& A, size_t row_start, size_t row_end, size_t c
     const auto& shape = A.shape();
     if (shape.size() != 2)
         throw std::invalid_argument("slice: only 2D arrays supported");
-    if (row_end > shape[0] || col_end > shape[1])
+    if (row_start > row_end || col_start > col_end)
+        throw std::invalid_argument("slice: start must be <= end");
+    if (row_end > shape[0] || col_end > shape[1] || row_start >= shape[0] || col_start >= shape[1])
         throw std::out_of_range("slice: indices out of bounds");
 
     size_t rows = row_end - row_start;
