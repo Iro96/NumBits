@@ -13,13 +13,21 @@ namespace numbits {
  * @return ndarray<T> sharing the same underlying data
  */
 template <typename T>
-ndarray<T> reshape(const ndarray<T>& A, const std::initializer_list<size_t>& new_shape) {
+ndarray<T> reshape(const ndarray<T>& A, const std::vector<size_t>& new_shape) {
     size_t old_size = A.size();
     size_t new_size = std::accumulate(new_shape.begin(), new_shape.end(), size_t{1}, std::multiplies<size_t>());
     if (old_size != new_size)
         throw std::invalid_argument("reshape: total size must remain the same");
 
-    return ndarray<T>(std::vector<size_t>(new_shape), A.data_ptr());
+    return ndarray<T>(new_shape, A.data_ptr());
+}
+
+/**
+ * @brief Overload: Accept initializer_list as new shape
+ */
+template <typename T>
+ndarray<T> reshape(const ndarray<T>& A, const std::initializer_list<size_t>& new_shape) {
+    return reshape(A, std::vector<size_t>(new_shape));
 }
 
 /**
@@ -73,9 +81,9 @@ ndarray<T> transpose(const ndarray<T>& A) {
  * @brief Broadcast array to a new shape (size-1 axes can expand).
  */
 template <typename T>
-ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>& target_shape) {
+ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_shape) {
     const auto& orig_shape = A.shape();
-    std::vector<size_t> new_shape(target_shape);
+    std::vector<size_t> new_shape = target_shape;
 
     if (orig_shape.size() > new_shape.size())
         throw std::invalid_argument("broadcast_to: target shape must have >= dimensions");
@@ -86,13 +94,19 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>
             throw std::invalid_argument("broadcast_to: incompatible shapes");
     }
 
-    ndarray<T> B({new_shape.begin(), new_shape.end()});
+    ndarray<T> B(new_shape);
     const auto& src = A.data();
     auto& dst = B.data();
     for (size_t idx = 0; idx < B.size(); ++idx)
         dst[idx] = src[idx % A.size()];
 
     return B;
+}
+
+/** Overload for initializer_list */
+template <typename T>
+ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>& target_shape) {
+    return broadcast_to(A, std::vector<size_t>(target_shape));
 }
 
 /**
