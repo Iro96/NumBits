@@ -104,7 +104,6 @@ public:
         if (!data_) throw std::logic_error("ndarray: data not initialized");
         return *data_;
     }
-    const std::vector<T>& data() const noexcept { return *data_; }
 
     /** @return Shared pointer to underlying data */
     std::shared_ptr<std::vector<T>> data_ptr() const noexcept { return data_; }
