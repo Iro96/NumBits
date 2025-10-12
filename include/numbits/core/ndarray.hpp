@@ -96,8 +96,14 @@ public:
         return (*data_)[i * shape_[1] + j];
     }
 
-    /** @return Reference to underlying vector */
-    std::vector<T>& data() noexcept { return *data_; }
+    std::vector<T>& data() {
+        if (!data_) throw std::logic_error("ndarray: data not initialized");
+        return *data_;
+    }
+    const std::vector<T>& data() const {
+        if (!data_) throw std::logic_error("ndarray: data not initialized");
+        return *data_;
+    }
     const std::vector<T>& data() const noexcept { return *data_; }
 
     /** @return Shared pointer to underlying data */
