@@ -68,7 +68,7 @@ public:
     const std::vector<size_t>& shape() const noexcept { return shape_; }
 
     /** @return Total number of elements */
-    size_t size() const noexcept { return data_->size(); }
+    size_t size() const noexcept { return data_ ? data_->size() : 0; }
 
     /** 2D element access (safe) */
     T& operator()(size_t i, size_t j) {
