@@ -50,6 +50,8 @@ public:
     explicit ndarray(const std::vector<size_t>& shape, T init = T()) {
         if (shape.empty())
             throw std::invalid_argument("ndarray: shape cannot be empty");
+        if (std::any_of(shape.begin(), shape.end(), [](size_t d){ return d == 0; }))
+            throw std::invalid_argument("ndarray: shape dimensions must be > 0");
 
         shape_ = shape;
         size_t total = std::accumulate(shape.begin(), shape.end(), size_t{1}, std::multiplies<size_t>());
