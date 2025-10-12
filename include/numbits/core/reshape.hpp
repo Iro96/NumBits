@@ -74,11 +74,6 @@ ndarray<T> transpose(const ndarray<T>& A) {
     const auto& shape = A.shape();
     if (shape.size() != 2)
         throw std::invalid_argument("transpose: only 2D arrays supported");
-    // Fast no-op for 1xN or Nx1 by reshaping with shared data
-    if (shape[0] == 1 || shape[1] == 1) {
-        return ndarray<T>({shape[1], shape[0]}, A.data_ptr());
-    }
-    // Fallback: create a transposed copy
     ndarray<T> B({shape[1], shape[0]});
     for (size_t i = 0; i < shape[0]; ++i)
         for (size_t j = 0; j < shape[1]; ++j)
