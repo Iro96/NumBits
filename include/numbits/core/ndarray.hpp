@@ -123,6 +123,7 @@ public:
      * @return Reference to the element at row `i` and column `j`.
      *
      * @throws std::logic_error if the array is not 2-dimensional.
+     * @throws std::logic_error if the array is not initialized.
      * @throws std::out_of_range if `i` or `j` is outside the valid range for their dimension.
      */
     T& operator()(size_t i, size_t j) {
@@ -136,6 +137,7 @@ public:
      * @param i Row index (zero-based).
      * @param j Column index (zero-based).
      * @return const T& Reference to the element located at (i, j).
+     * @throws std::logic_error if the array is not initialized.
      * @throws std::logic_error If the array is not 2D or the underlying data is not initialized.
      * @throws std::out_of_range If `i` or `j` is outside the valid range for the corresponding dimension.
      */
@@ -180,14 +182,18 @@ public:
     /**
      * @brief Fills every element of the array with the specified value.
      *
+     * @throws std::logic_error if the array is not initialized.
+     *
      * @param value Value to assign to each element.
      */
-    void fill(T value) noexcept(std::is_nothrow_copy_assignable_v<T>) {
+    void fill(T value) {
+        if (!data_)
+            throw std::logic_error("ndarray: data not initialized");
         std::fill(data_->begin(), data_->end(), value);
-    }
+     }
 
     /** Pretty-print 2D arrays; for others, show shape */
-    friend /**
+    /**
      * @brief Formats an ndarray for stream output.
      *
      * Prints 2D arrays as rows enclosed in brackets, each row on its own line.
@@ -197,7 +203,7 @@ public:
      * @param arr Array to format.
      * @return std::ostream& Reference to the output stream.
      */
-    std::ostream& operator<<(std::ostream& os, const ndarray& arr) {
+    friend std::ostream& operator<<(std::ostream& os, const ndarray& arr) {
         if (arr.shape_.size() != 2) {
             os << "ndarray(shape=(";
             for (size_t i = 0; i < arr.shape_.size(); ++i)
@@ -232,6 +238,8 @@ private:
      */
 
     void validate_2d_access(size_t i, size_t j) const {
+        if (!data_)
+            throw std::logic_error("ndarray: data not initialized");
         if (shape_.size() != 2)
             throw std::logic_error("ndarray: invalid 2D access on non-2D array");
         if (i >= shape_[0] || j >= shape_[1])
