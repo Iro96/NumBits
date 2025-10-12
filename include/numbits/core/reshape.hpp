@@ -14,6 +14,10 @@ namespace numbits {
  */
 template <typename T>
 ndarray<T> reshape(const ndarray<T>& A, const std::vector<size_t>& new_shape) {
+    if (new_shape.empty())
+        throw std::invalid_argument("reshape: shape cannot be empty");
+    if (std::any_of(new_shape.begin(), new_shape.end(), [](size_t d){ return d == 0; }))
+        throw std::invalid_argument("reshape: shape dimensions must be > 0");
     size_t old_size = A.size();
     size_t new_size = std::accumulate(new_shape.begin(), new_shape.end(), size_t{1}, std::multiplies<size_t>());
     if (old_size != new_size)
