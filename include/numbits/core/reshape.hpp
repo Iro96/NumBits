@@ -7,27 +7,25 @@
 namespace numbits {
 
 /**
- * @brief Reshape an ndarray to a new shape without copying the data.
- * 
- * @tparam T Array element type.
- * @param A Input array.
- * @param new_shape Desired shape.
- * @return ndarray<T> Reshaped array sharing the same data.
- * @throws std::invalid_argument if total size does not match.
+ * @brief Reshape an ndarray to a new shape without copying data.
+ * @param A Input array
+ * @param new_shape Desired shape (total size must match)
+ * @return New ndarray sharing the same data
  */
 template <typename T>
 ndarray<T> reshape(const ndarray<T>& A, const std::initializer_list<size_t>& new_shape) {
     size_t old_size = A.size();
     size_t new_size = std::accumulate(new_shape.begin(), new_shape.end(), size_t{1}, std::multiplies<size_t>());
-    if (old_size != new_size)
+    if (old_size != new_size) {
         throw std::invalid_argument("reshape: total size must remain the same");
+    }
 
     std::vector<size_t> shape_vec(new_shape);
-    return ndarray<T>(shape_vec, A.data_);  // share underlying data
+    return ndarray<T>(shape_vec, A.data_ptr());
 }
 
 /**
- * @brief Expand dimensions by inserting a size-1 axis at specified position.
+ * @brief Insert a new axis of size 1 at the specified position
  */
 template <typename T>
 ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
@@ -35,13 +33,11 @@ ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
     if (axis > new_shape.size())
         throw std::invalid_argument("expand_dims: axis out of bounds");
     new_shape.insert(new_shape.begin() + axis, 1);
-    return ndarray<T>(new_shape, A.data_);
+    return ndarray<T>(new_shape, A.data_ptr());
 }
 
 /**
- * @brief Remove size-1 dimensions from the shape.
- * 
- * @param axis If >=0, remove only that axis.
+ * @brief Remove axes of size 1. If axis >= 0, remove only that axis
  */
 template <typename T>
 ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
@@ -55,17 +51,18 @@ ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
     } else {
         new_shape.erase(std::remove(new_shape.begin(), new_shape.end(), 1), new_shape.end());
     }
-    return ndarray<T>(new_shape, A.data_);
+    return ndarray<T>(new_shape, A.data_ptr());
 }
 
 /**
- * @brief Transpose a 2D array.
+ * @brief Transpose a 2D array
  */
 template <typename T>
 ndarray<T> transpose(const ndarray<T>& A) {
     const auto& shape = A.shape();
     if (shape.size() != 2)
         throw std::invalid_argument("transpose: only 2D arrays supported");
+
     ndarray<T> B({shape[1], shape[0]});
     for (size_t i = 0; i < shape[0]; ++i)
         for (size_t j = 0; j < shape[1]; ++j)
@@ -74,12 +71,13 @@ ndarray<T> transpose(const ndarray<T>& A) {
 }
 
 /**
- * @brief Broadcast array to a new shape (size-1 axes expanded).
+ * @brief Broadcast array to a new shape (size-1 axes can expand)
  */
 template <typename T>
 ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>& target_shape) {
     const auto& orig_shape = A.shape();
     std::vector<size_t> new_shape(target_shape);
+
     if (orig_shape.size() > new_shape.size())
         throw std::invalid_argument("broadcast_to: target shape must have >= dimensions");
 
@@ -99,7 +97,7 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>
 }
 
 /**
- * @brief Slice a 2D ndarray (start inclusive, end exclusive).
+ * @brief Slice a 2D array by row/col ranges
  */
 template <typename T>
 ndarray<T> slice(const ndarray<T>& A, size_t row_start, size_t row_end, size_t col_start, size_t col_end) {
@@ -108,8 +106,6 @@ ndarray<T> slice(const ndarray<T>& A, size_t row_start, size_t row_end, size_t c
         throw std::invalid_argument("slice: only 2D arrays supported");
     if (row_end > shape[0] || col_end > shape[1])
         throw std::out_of_range("slice: indices out of bounds");
-    if (row_start >= row_end || col_start >= col_end)
-        throw std::invalid_argument("slice: start must be less than end");
 
     size_t rows = row_end - row_start;
     size_t cols = col_end - col_start;
