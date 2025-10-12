@@ -13,8 +13,9 @@ namespace numbits {
 
 /**
  * @brief Simple n-dimensional array container with shared underlying data.
- * 
- * @tparam T Type of elements stored in the array.
+ *        Supports 2D indexing, element access, fill, and pretty printing.
+ *
+ * @tparam T Type of elements.
  */
 template <typename T>
 class ndarray {
@@ -22,8 +23,8 @@ public:
     ndarray() = default;
 
     /**
-     * @brief Construct an ndarray with given shape, optionally initializing values.
-     * @param shape List of dimensions (cannot be empty).
+     * @brief Construct an ndarray with given shape and optional initial value.
+     * @param shape List of dimension sizes (cannot be empty).
      * @param init Initial value for all elements (default T()).
      */
     explicit ndarray(std::initializer_list<size_t> shape, T init = T()) {
@@ -33,13 +34,11 @@ public:
         shape_.assign(shape.begin(), shape.end());
         const size_t total = std::accumulate(
             shape_.begin(), shape_.end(), static_cast<size_t>(1), std::multiplies<size_t>());
-
         data_ = std::make_shared<std::vector<T>>(total, init);
     }
 
     /**
-     * @brief Construct ndarray from existing shared data and shape.
-     *        Used internally for reshape / expand_dims without copying.
+     * @brief Construct ndarray with existing shared data (used internally for reshape / views)
      */
     ndarray(const std::vector<size_t>& shape, std::shared_ptr<std::vector<T>> data_ptr)
         : shape_(shape), data_(data_ptr) {}
@@ -50,10 +49,7 @@ public:
     /** @return Total number of elements */
     size_t size() const noexcept { return data_->size(); }
 
-    /** 
-     * @brief 2D element access (row, col) with bounds check 
-     * @throws logic_error if array is not 2D
-     */
+    // --- 2D Safe Access ---
     T& operator()(size_t i, size_t j) {
         validate_2d_access(i, j);
         return (*data_)[i * shape_[1] + j];
@@ -64,24 +60,19 @@ public:
         return (*data_)[i * shape_[1] + j];
     }
 
-    /** @return Reference to underlying vector of data */
+    /** @return Reference to underlying vector */
     std::vector<T>& data() noexcept { return *data_; }
     const std::vector<T>& data() const noexcept { return *data_; }
 
-    /**
-     * @brief Get shared pointer to underlying data (for reshaping / broadcasting).
-     */
+    /** @return Shared pointer to underlying data (for views / reshape) */
     std::shared_ptr<std::vector<T>> data_ptr() const noexcept { return data_; }
 
-    /**
-     * @brief Fill the array with a value
-     * @param value Value to fill
-     */
+    /** Fill all elements with a value */
     void fill(T value) noexcept(std::is_nothrow_copy_assignable_v<T>) {
         std::fill(data_->begin(), data_->end(), value);
     }
 
-    /** @brief Stream output (only pretty prints 2D arrays) */
+    /** Pretty-print 2D arrays; for others, just show shape */
     friend std::ostream& operator<<(std::ostream& os, const ndarray& arr) {
         if (arr.shape_.size() != 2) {
             os << "ndarray(shape=(";
@@ -103,7 +94,7 @@ public:
 
 private:
     std::vector<size_t> shape_;
-    std::shared_ptr<std::vector<T>> data_;  ///< Underlying data storage
+    std::shared_ptr<std::vector<T>> data_;  ///< Shared data storage
 
     void validate_2d_access(size_t i, size_t j) const {
         if (shape_.size() != 2)
@@ -113,4 +104,4 @@ private:
     }
 };
 
-} // namespace numbits
+}  // namespace numbits
