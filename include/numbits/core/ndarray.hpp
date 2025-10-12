@@ -132,14 +132,13 @@ public:
     }
 
     /**
-     * Accesses the element at the specified row and column in a 2D array.
+     * @brief Accesses the element at the specified row and column in a 2D array.
      *
      * @param i Row index (zero-based).
      * @param j Column index (zero-based).
-     * @return const T& Reference to the element located at (i, j).
-     * @throws std::logic_error if the array is not initialized.
-     * @throws std::logic_error If the array is not 2D or the underlying data is not initialized.
-     * @throws std::out_of_range If `i` or `j` is outside the valid range for the corresponding dimension.
+     * @return const T& Const reference to the element at (i, j).
+     * @throws std::logic_error if the array is not 2D or data is not initialized.
+     * @throws std::out_of_range if `i` or `j` is out of bounds.
      */
     const T& operator()(size_t i, size_t j) const {
         validate_2d_access(i, j);
