@@ -92,9 +92,9 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
     if (orig_shape.size() > new_shape.size())
         throw std::invalid_argument("broadcast_to: target shape must have >= dimensions");
 
-    size_t offset = new_shape.size() - orig_shape.size();
+    size_t align_offset = new_shape.size() - orig_shape.size();
     for (size_t i = 0; i < orig_shape.size(); ++i) {
-        if (orig_shape[i] != 1 && orig_shape[i] != new_shape[i + offset])
+        if (orig_shape[i] != 1 && orig_shape[i] != new_shape[i + align_offset])
             throw std::invalid_argument("broadcast_to: incompatible shapes");
     }
 
@@ -107,7 +107,7 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
     std::vector<size_t> dst_shape = B.shape();
     size_t ndim_dst = dst_shape.size();
     size_t ndim_src = src_shape.size();
-    // reuse existing offset (ndim_dst - ndim_src is equal to new_shape.size() - orig_shape.size())
+    size_t dst_src_offset = ndim_dst - ndim_src;
 
     // Compute strides for source in row-major
     std::vector<size_t> src_strides(ndim_src, 1);
@@ -115,16 +115,14 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
         src_strides[i] = src_strides[i + 1] * src_shape[i + 1];
 
     for (size_t idx = 0; idx < B.size(); ++idx) {
-        // Unravel idx into dst indices
         size_t rem = idx;
         size_t src_flat = 0;
         for (size_t k = 0; k < ndim_dst; ++k) {
             size_t dim = dst_shape[ndim_dst - 1 - k];
             size_t coord = rem % dim;
             rem /= dim;
-            // Map to source axis if exists
-            if (ndim_dst - 1 - k >= offset) {
-                size_t s_axis = (ndim_dst - 1 - k) - offset;
+            if (ndim_dst - 1 - k >= dst_src_offset) {
+                size_t s_axis = (ndim_dst - 1 - k) - dst_src_offset;
                 size_t s_dim = src_shape[s_axis];
                 size_t s_coord = (s_dim == 1) ? 0 : coord;
                 src_flat += s_coord * src_strides[s_axis];
