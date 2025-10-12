@@ -59,8 +59,14 @@ public:
     }
 
     /**
-     * @brief Construct ndarray with existing shared data (used for reshape/views)
-     * @param shape Vector of dimensions
+     ndarray(const std::vector<size_t>& shape, std::shared_ptr<std::vector<T>> data_ptr)
+         : shape_(shape), data_(std::move(data_ptr)) {
+         if (!data_)
+             throw std::invalid_argument("ndarray: data_ptr cannot be null");
+         const size_t expected = std::accumulate(shape_.begin(), shape_.end(), size_t{1}, std::multiplies<size_t>());
+         if (data_->size() != expected)
+             throw std::invalid_argument("ndarray: data size does not match shape");
+     }
      * @param data_ptr Shared pointer to existing data
      */
     ndarray(const std::vector<size_t>& shape, std::shared_ptr<std::vector<T>> data_ptr)
