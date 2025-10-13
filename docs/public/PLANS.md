@@ -1,8 +1,8 @@
 | Version      | Stage                | Focus                          | Description                                                          |
 | ------------ | -------------------- | ------------------------------ | -------------------------------------------------------------------- |
 | ✅ **v0.1**   | Core MVP             | Array + Basic Ops              | `ndarray<T>`, arithmetic, reductions, random, dot, stats             |
-| 🔜 **v0.2**  | Array Manipulation   | Shape ops, broadcasting, views | `reshape`, `transpose`, `expand_dims`, `broadcast_to`, slicing       |
-| 🔜 **v0.3**  | Linear Algebra       | Full matrix API                | `matmul`, `inv`, `det`, `eig`, `svd`, `norm`, `trace`                |
+| ✅ **v0.2**  | Array Manipulation   | Shape ops, broadcasting, views | `reshape`, `transpose`, `expand_dims`, `broadcast_to`, slicing       |
+| ✅ **v0.3**  | Linear Algebra       | Full matrix API                | `matmul`, `inv`, `det`, `eig`, `svd`, `norm`, `trace`                |
 | 🔜 **v0.4**  | Advanced Math        | Universal functions            | `sin`, `cos`, `tan`, `log`, `exp`, `pow`, elementwise `ufunc` system |
 | 🔜 **v0.5**  | Statistics           | Correlation, covariance        | `corrcoef`, `cov`, `histogram`, `percentile`                         |
 | 🔜 **v0.6**  | I/O + Serialization  | File save/load                 | `save`, `load`, `savetxt`, `loadtxt`, binary `.npy` support          |

@@ -17,7 +17,7 @@ NumBits is a lightweight C++ numerical computing library inspired by NumPy. It p
 | ------------ | -------------------- | ------------------------------ | -------------------------------------------------------------------- |
 | ✅ **v0.1**  | Core MVP             | Array + Basic Ops              | `ndarray<T>`, arithmetic, reductions, random, dot, stats             |
 | ✅ **v0.2**  | Array Manipulation   | Shape ops, broadcasting, views | `reshape`, `transpose`, `expand_dims`, `broadcast_to`, slicing       |
-| 🔜 **v0.3**  | Linear Algebra       | Full matrix API                | `matmul`, `inv`, `det`, `eig`, `svd`, `norm`, `trace`                |
+| ✅ **v0.3**  | Linear Algebra       | Full matrix API                | `matmul`, `inv`, `det`, `eig`, `svd`, `norm`, `trace`                |
 | 🔜 **v0.4**  | Advanced Math        | Universal functions            | `sin`, `cos`, `tan`, `log`, `exp`, `pow`, elementwise `ufunc` system |
 | 🔜 **v0.5**  | Statistics           | Correlation, covariance        | `corrcoef`, `cov`, `histogram`, `percentile`                         |
 | 🔜 **v0.6**  | I/O + Serialization  | File save/load                 | `save`, `load`, `savetxt`, `loadtxt`, binary `.nbc` support          |
@@ -47,7 +47,53 @@ g++ path_to_your_file.cpp -o path_to_your_output -I./include -std=c++20
 path_to_your_output
 ```
 
-### Example code (v0.2)
+### Example code (v0.3 - Linear Algebra)
+
+```cpp
+#include <iostream>
+#include "numbits/numbits.hpp"
+
+int main() {
+    using namespace numbits;
+
+    // Matrix multiplication
+    ndarray<double> A({2, 3}, 1.0);
+    ndarray<double> B({3, 2}, 2.0);
+    auto C = matmul(A, B);
+    std::cout << "Matrix multiplication C = A × B:\n" << C;
+
+    // Matrix inverse
+    ndarray<double> M({2, 2});
+    M(0, 0) = 4; M(0, 1) = 7;
+    M(1, 0) = 2; M(1, 1) = 6;
+    auto M_inv = inv(M);
+    std::cout << "Inverse of M:\n" << M_inv;
+
+    // Determinant
+    std::cout << "Determinant of M: " << det(M) << "\n";
+
+    // Trace
+    std::cout << "Trace of M: " << trace(M) << "\n";
+
+    // Matrix norm
+    std::cout << "Frobenius norm: " << norm(M, "fro") << "\n";
+
+    // Eigenvalues and eigenvectors
+    auto [eigenvals, eigenvecs] = eig(M);
+    std::cout << "Eigenvalues:\n" << eigenvals;
+    std::cout << "Eigenvectors:\n" << eigenvecs;
+
+    // SVD decomposition
+    auto [U, S, Vt] = svd(M);
+    std::cout << "SVD - U:\n" << U;
+    std::cout << "SVD - Sigma:\n" << S;
+    std::cout << "SVD - V^T:\n" << Vt;
+
+    return 0;
+}
+```
+
+### Example code (v0.2 - Full API)
 
 ```cpp
 #include <iostream>
