@@ -8,6 +8,7 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+#include <type_traits>
 
 namespace numbits {
 
@@ -161,6 +162,7 @@ double norm(const ndarray<T>& A, const std::string& ord = "fro") {
  */
 template <typename T>
 T det(const ndarray<T>& A) {
+    static_assert(std::is_floating_point_v<T>, "det: T must be floating-point");
     const auto& s = A.shape();
     if (s.size() != 2)
         throw std::invalid_argument("det: expected 2D ndarray");
@@ -229,6 +231,7 @@ T det(const ndarray<T>& A) {
  */
 template <typename T>
 ndarray<T> inv(const ndarray<T>& A) {
+    static_assert(std::is_floating_point_v<T>, "inv: T must be floating-point");
     const auto& s = A.shape();
     if (s.size() != 2)
         throw std::invalid_argument("inv: expected 2D ndarray");
@@ -310,6 +313,7 @@ ndarray<T> inv(const ndarray<T>& A) {
  */
 template <typename T>
 std::pair<ndarray<T>, ndarray<T>> eig(const ndarray<T>& A, size_t max_iter = 1000, double tol = 1e-10) {
+    static_assert(std::is_floating_point_v<T>, "eig: T must be floating-point");
     const auto& s = A.shape();
     if (s.size() != 2)
         throw std::invalid_argument("eig: expected 2D ndarray");
@@ -422,6 +426,7 @@ std::pair<ndarray<T>, ndarray<T>> eig(const ndarray<T>& A, size_t max_iter = 100
  */
 template <typename T>
 std::tuple<ndarray<T>, ndarray<T>, ndarray<T>> svd(const ndarray<T>& A, size_t max_iter = 1000, double tol = 1e-10) {
+    static_assert(std::is_floating_point_v<T>, "svd: T must be floating-point");
     const auto& s = A.shape();
     if (s.size() != 2)
         throw std::invalid_argument("svd: expected 2D ndarray");
@@ -449,14 +454,16 @@ std::tuple<ndarray<T>, ndarray<T>, ndarray<T>> svd(const ndarray<T>& A, size_t m
     // Reorder V and compute singular values
     ndarray<T> V_sorted({n, n});
     ndarray<T> S({m, n}, T{});
-    const size_t r = std::min(m, n);
-    for (size_t i = 0; i < r; ++i) {
-         size_t idx = sorted_eigs[i].second;
-         T sing_val = std::sqrt(std::max(T{0}, sorted_eigs[i].first));
-         S(i, i) = sing_val;
-         for (size_t j = 0; j < n; ++j)
-             V_sorted(j, i) = V(j, idx);
-     }
+        const size_t r = std::min(m, n);
+        for (size_t i = 0; i < n; ++i) {
+            size_t idx = sorted_eigs[i].second;
+            if (i < r) {
+                T sing_val = std::sqrt(std::max(T{0}, sorted_eigs[i].first));
+                S(i, i) = sing_val;
+            }
+            for (size_t j = 0; j < n; ++j)
+                V_sorted(j, i) = V(j, idx);
+        }
     
     // Compute U = A * V * S^{-1}
     ndarray<T> U({m, m}, T{});
@@ -473,7 +480,6 @@ std::tuple<ndarray<T>, ndarray<T>, ndarray<T>> svd(const ndarray<T>& A, size_t m
         }
     }
     
-    // Complete U to orthonormal basis if needed (simplified - just fill with identity)
     // NOTE: Simplified implementation - remaining U columns are set to identity,
     // which does NOT form a proper orthonormal basis. A full implementation
     // would use Gram-Schmidt or SVD-based null-space completion.
