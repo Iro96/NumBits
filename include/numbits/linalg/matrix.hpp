@@ -441,13 +441,14 @@ std::tuple<ndarray<T>, ndarray<T>, ndarray<T>> svd(const ndarray<T>& A, size_t m
     // Reorder V and compute singular values
     ndarray<T> V_sorted({n, n});
     ndarray<T> S({m, n}, T{});
-    for (size_t i = 0; i < n; ++i) {
-        size_t idx = sorted_eigs[i].second;
-        T sing_val = std::sqrt(std::max(T{0}, sorted_eigs[i].first));
-        S(i, i) = sing_val;
-        for (size_t j = 0; j < n; ++j)
-            V_sorted(j, i) = V(j, idx);
-    }
+    const size_t r = std::min(m, n);
+    for (size_t i = 0; i < r; ++i) {
+         size_t idx = sorted_eigs[i].second;
+         T sing_val = std::sqrt(std::max(T{0}, sorted_eigs[i].first));
+         S(i, i) = sing_val;
+         for (size_t j = 0; j < n; ++j)
+             V_sorted(j, i) = V(j, idx);
+     }
     
     // Compute U = A * V * S^{-1}
     ndarray<T> U({m, m}, T{});
