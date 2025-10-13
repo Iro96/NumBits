@@ -112,7 +112,7 @@ int main() {
     auto S = expand_dims(B, 0); // add new axis at front -> shape (1,2,3)
     std::cout << "Expanded B shape (1x2x3): " << S.shape()[0] << "x" << S.shape()[1] << "x" << S.shape()[2] << "\n";
 
-    auto T = broadcast_to(A, {2, 3, 4}); // broadcast 2x3 -> 2x3x4
+    auto T = broadcast_to(A, {4, 2, 3}); // broadcast 2x3 -> 4x2x3
     std::cout << "Broadcasted A shape (2x3x4): " << T.shape()[0] << "x" << T.shape()[1] << "x" << T.shape()[2] << "\n";
 
     // 7. Squeeze
