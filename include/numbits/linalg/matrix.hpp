@@ -1,9 +1,15 @@
 #pragma once
 #include "../core/ndarray.hpp"
 #include <stdexcept>
+#include "../core/ndarray.hpp"
+#include <stdexcept>
 #include <cmath>
 #include <algorithm>
 #include <limits>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 namespace numbits {
 
