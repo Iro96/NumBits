@@ -334,6 +334,7 @@ std::pair<ndarray<T>, ndarray<T>> eig(const ndarray<T>& A, size_t max_iter = 100
         V(i, i) = T{1};
     
     // QR algorithm iterations
+    bool converged = false;
     for (size_t iter = 0; iter < max_iter; ++iter) {
         // Simple QR decomposition using Gram-Schmidt
         ndarray<T> Q({n, n}, T{});
@@ -394,8 +395,16 @@ std::pair<ndarray<T>, ndarray<T>> eig(const ndarray<T>& A, size_t max_iter = 100
         Ak = Ak_new;
         V = V_new;
         
-        if (off_diag_norm < tol)
+        if (off_diag_norm < tol) {
+            converged = true;
             break;
+        }
+    }
+    
+    if (!converged) {
+        // Option 1: Throw exception
+        throw std::runtime_error("eig: QR algorithm did not converge within max_iter");
+        // Option 2: Issue warning (requires logging facility)
     }
     
     // Extract eigenvalues from diagonal
