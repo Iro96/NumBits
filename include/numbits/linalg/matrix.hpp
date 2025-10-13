@@ -1,8 +1,6 @@
 #pragma once
 #include "../core/ndarray.hpp"
 #include <stdexcept>
-#include "../core/ndarray.hpp"
-#include <stdexcept>
 #include <cmath>
 #include <algorithm>
 #include <limits>
@@ -141,10 +139,14 @@ double norm(const ndarray<T>& A, const std::string& ord = "fro") {
         return max_sum;
     }
     else if (ord == "2") {
-        // 2-norm (spectral norm): For now, use Frobenius as approximation
-        // Full implementation would require SVD
-        return norm(A, "fro");
-    }
+                // 2-norm (spectral norm): largest singular value
+                auto [U, S, Vt] = svd(A);
+                const size_t r = std::min(s[0], s[1]);
+                double max_sing = 0.0;
+                for (size_t i = 0; i < r; ++i)
+                    max_sing = std::max(max_sing, std::abs(static_cast<double>(S(i, i))));
+                return max_sing;
+             }
     else {
         throw std::invalid_argument("norm: unsupported norm type '" + ord + "'");
     }
@@ -472,6 +474,9 @@ std::tuple<ndarray<T>, ndarray<T>, ndarray<T>> svd(const ndarray<T>& A, size_t m
     }
     
     // Complete U to orthonormal basis if needed (simplified - just fill with identity)
+    // NOTE: Simplified implementation - remaining U columns are set to identity,
+    // which does NOT form a proper orthonormal basis. A full implementation
+    // would use Gram-Schmidt or SVD-based null-space completion.
     for (size_t i = std::min(m, n); i < m; ++i)
         U(i, i) = T{1};
     
