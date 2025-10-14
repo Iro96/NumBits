@@ -27,6 +27,11 @@ NumBits is a lightweight C++ numerical computing library inspired by NumPy. It p
 | 🔜 **v1.0**  | Python API           | `import numbits` via pybind11  | Expose C++ API to Python for hybrid workflows                        |
 | 🌟 **v1.1+** | AI / Autograd        | Differentiation engine         | Automatic gradients, neural ops, backpropagation                     |
 
+### Contributing
+
+We welcome contributions from everyone! For detailed guidelines on how to contribute, please see [CONTRIBUTING.md](https://github.com/Iro96/NumBits/blob/main/.github/CONTRIBUTING.md) in this repository.  
+> Thanks for helping build NumBits
+
 ---
 
 ## How To Use
@@ -43,7 +48,7 @@ cd ./NumBits
 #### Windows
 
 ```bash
-g++ path_to_your_file.cpp -o path_to_your_output -I./include -std=c++20
+g++ path_to_your_file.cpp -o path_to_your_output -I./include -std=c++2a
 path_to_your_output
 ```
 
@@ -97,14 +102,7 @@ int main() {
 
 ```cpp
 #include <iostream>
-#include "numbits/core/ndarray.hpp"
-#include "numbits/core/reshape.hpp"
-#include "numbits/ops/arithmetic.hpp"
-#include "numbits/ops/reduction.hpp"
-#include "numbits/linalg/matrix.hpp"
-#include "numbits/math/math.hpp"
-#include "numbits/stats/statistics.hpp"
-#include "numbits/random/generator.hpp"
+#include "numbits.hpp/numbits.hpp"
 
 int main() {
     using namespace numbits;
