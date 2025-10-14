@@ -64,7 +64,7 @@ Click the Fork button on the top right corner of the repo page.
 ### 2. Clone your fork
 
 ```bash
-git clone https://github.com/<your-github-username>/NumBits.git
+git clone https://github.com/Iro96/NumBits.git
 cd NumBits
 ```
 
