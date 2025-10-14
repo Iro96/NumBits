@@ -5,6 +5,7 @@
 NumBits is a lightweight C++ numerical computing library inspired by NumPy. It provides multidimensional arrays (`ndarray<T>`), basic arithmetic operations, reductions, linear algebra, random number generation, and statistical functions.
 
 [![CMake on multiple platforms](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml/badge.svg?branch=main)](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml)
+[![CodeQL Advanced](https://github.com/Iro96/NumBits/actions/workflows/codeql.yml/badge.svg)](https://github.com/Iro96/NumBits/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 </div>
