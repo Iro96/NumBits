@@ -1,6 +1,5 @@
 name: 🐞 Bug report
 description: Report an issue (Something not working? Something went wrong? Report it here!)
-type: Bug
 labels: [pending triage]
 body:
   - type: markdown
