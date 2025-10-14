@@ -48,7 +48,7 @@ cd ./NumBits
 #### Windows
 
 ```bash
-g++ path_to_your_file.cpp -o path_to_your_output -I./include -std=c++20
+g++ path_to_your_file.cpp -o path_to_your_output -I./include -std=c++2a
 path_to_your_output
 ```
 
