@@ -55,4 +55,4 @@ path_to_your_output
 
 ### 2. Example code 
 > [!NOTE]
-> Pls see in `./examples/*.cpp`
+> Please see in `./examples/*.cpp`
