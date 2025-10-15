@@ -37,7 +37,7 @@ We welcome contributions from everyone! For detailed guidelines on how to contri
 
 ## How To Use
 
-### How to compile
+### 1. How to compile
 
 #### Clone the repository
 
@@ -53,5 +53,6 @@ g++ path_to_your_file.cpp -o path_to_your_output -I./include -std=c++2a
 path_to_your_output
 ```
 
-### Example code 
-Pls see in `./examples/*.cpp`
+### 2. Example code 
+> [!NOTE]
+> Please see in `./examples/*.cpp`
