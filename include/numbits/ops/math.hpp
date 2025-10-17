@@ -3,101 +3,73 @@
 #include <cmath>
 #include <type_traits>
 #include <stdexcept>
+#include <functional>
+#include <vector>
 
 namespace numbits {
+
+/**
+ * @brief Apply a unary function elementwise to an n-dimensional ndarray.
+ *
+ * @tparam T Floating-point type.
+ * @tparam Func Callable taking T and returning T.
+ * @param A Input ndarray of any rank.
+ * @param func Unary function to apply elementwise.
+ * @param name Function name (for error messages).
+ * @return ndarray<T> Result of applying func to each element of A.
+ *
+ * @throws std::logic_error if A has uninitialized data.
+ */
+template <typename T, typename Func>
+ndarray<T> elementwise(const ndarray<T>& A, Func func, const char* name) {
+    static_assert(std::is_floating_point_v<T>,
+                  "numbits::elementwise requires floating-point T");
+
+    const auto& shape = A.shape();
+    if (A.size() == 0)
+        throw std::logic_error(std::string(name) + ": input ndarray has no data");
+
+    ndarray<T> B(shape);
+    const size_t total = A.size();
+
+    for (size_t i = 0; i < total; ++i)
+        B[i] = func(A[i]);
+
+    return B;
+}
 
 /**
  * @brief Elementwise exponential: B = exp(A)
  */
 template <typename T>
 ndarray<T> exp(const ndarray<T>& A) {
-    static_assert(std::is_floating_point_v<T>,
-                  "numbits::exp requires floating-point T");
-
-    const auto& s = A.shape();
-    if (s.size() != 2)
-        throw std::invalid_argument("exp: expected a 2D ndarray");
-
-    const size_t rows = s[0], cols = s[1];
-    ndarray<T> B({rows, cols});
-
-    for (size_t i = 0; i < rows; ++i)
-        for (size_t j = 0; j < cols; ++j)
-            B(i, j) = std::exp(A(i, j));
-
-    return B;
+    return elementwise(A, [](T x){ return std::exp(x); }, "exp");
 }
 
 /**
  * @brief Elementwise square root: B = sqrt(A)
+ *
+ * @throws std::domain_error if any element is negative.
  */
 template <typename T>
 ndarray<T> sqrt(const ndarray<T>& A) {
-    static_assert(std::is_floating_point_v<T>,
-                  "numbits::sqrt requires floating-point T");
-
-    const auto& s = A.shape();
-    if (s.size() != 2)
-        throw std::invalid_argument("sqrt: expected a 2D ndarray");
-
-    const size_t rows = s[0], cols = s[1];
-    ndarray<T> B({rows, cols});
-
-    for (size_t i = 0; i < rows; ++i)
-        for (size_t j = 0; j < cols; ++j) {
-            if (A(i, j) < T(0))
-                throw std::domain_error("sqrt: negative input value");
-            B(i, j) = std::sqrt(A(i, j));
-        }
-
-    return B;
+    return elementwise(A, [](T x){
+        if (x < T(0)) throw std::domain_error("sqrt: negative input value");
+        return std::sqrt(x);
+    }, "sqrt");
 }
 
 /**
  * @brief Elementwise natural logarithm: B = log(A)
+ *
+ * @throws std::domain_error if any element is non-positive.
  */
 template <typename T>
 ndarray<T> log(const ndarray<T>& A) {
-    static_assert(std::is_floating_point_v<T>,
-                  "numbits::log requires floating-point T");
-
-    const auto& s = A.shape();
-    if (s.size() != 2)
-        throw std::invalid_argument("log: expected a 2D ndarray");
-
-    const size_t rows = s[0], cols = s[1];
-    ndarray<T> B({rows, cols});
-
-    for (size_t i = 0; i < rows; ++i)
-        for (size_t j = 0; j < cols; ++j) {
-            if (A(i, j) <= T(0))
-                throw std::domain_error("log: input must be positive");
-            B(i, j) = std::log(A(i, j));
-        }
-
-    return B;
-}
-
-/**
- * @brief Elementwise power: B = A^exponent
- */
-template <typename T>
-ndarray<T> pow(const ndarray<T>& A, T exponent) {
-    static_assert(std::is_floating_point_v<T>,
-                  "numbits::pow requires floating-point T");
-
-    const auto& s = A.shape();
-    if (s.size() != 2)
-        throw std::invalid_argument("pow: expected a 2D ndarray");
-
-    const size_t rows = s[0], cols = s[1];
-    ndarray<T> B({rows, cols});
-
-    for (size_t i = 0; i < rows; ++i)
-        for (size_t j = 0; j < cols; ++j)
-            B(i, j) = std::pow(A(i, j), exponent);
-
-    return B;
+    return elementwise(A, [](T x){
+        if (x <= T(0)) throw std::domain_error("log: input must be positive");
+        return std::log(x);
+    }, "log");
 }
 
 /**
@@ -105,21 +77,7 @@ ndarray<T> pow(const ndarray<T>& A, T exponent) {
  */
 template <typename T>
 ndarray<T> sin(const ndarray<T>& A) {
-    static_assert(std::is_floating_point_v<T>,
-                  "numbits::sin requires floating-point T");
-
-    const auto& s = A.shape();
-    if (s.size() != 2)
-        throw std::invalid_argument("sin: expected a 2D ndarray");
-
-    const size_t rows = s[0], cols = s[1];
-    ndarray<T> B({rows, cols});
-
-    for (size_t i = 0; i < rows; ++i)
-        for (size_t j = 0; j < cols; ++j)
-            B(i, j) = std::sin(A(i, j));
-
-    return B;
+    return elementwise(A, [](T x){ return std::sin(x); }, "sin");
 }
 
 /**
@@ -127,21 +85,7 @@ ndarray<T> sin(const ndarray<T>& A) {
  */
 template <typename T>
 ndarray<T> cos(const ndarray<T>& A) {
-    static_assert(std::is_floating_point_v<T>,
-                  "numbits::cos requires floating-point T");
-
-    const auto& s = A.shape();
-    if (s.size() != 2)
-        throw std::invalid_argument("cos: expected a 2D ndarray");
-
-    const size_t rows = s[0], cols = s[1];
-    ndarray<T> B({rows, cols});
-
-    for (size_t i = 0; i < rows; ++i)
-        for (size_t j = 0; j < cols; ++j)
-            B(i, j) = std::cos(A(i, j));
-
-    return B;
+    return elementwise(A, [](T x){ return std::cos(x); }, "cos");
 }
 
 /**
@@ -149,21 +93,15 @@ ndarray<T> cos(const ndarray<T>& A) {
  */
 template <typename T>
 ndarray<T> tan(const ndarray<T>& A) {
-    static_assert(std::is_floating_point_v<T>,
-                  "numbits::tan requires floating-point T");
+    return elementwise(A, [](T x){ return std::tan(x); }, "tan");
+}
 
-    const auto& s = A.shape();
-    if (s.size() != 2)
-        throw std::invalid_argument("tan: expected a 2D ndarray");
-
-    const size_t rows = s[0], cols = s[1];
-    ndarray<T> B({rows, cols});
-
-    for (size_t i = 0; i < rows; ++i)
-        for (size_t j = 0; j < cols; ++j)
-            B(i, j) = std::tan(A(i, j));
-
-    return B;
+/**
+ * @brief Elementwise power: B = A^exponent
+ */
+template <typename T>
+ndarray<T> pow(const ndarray<T>& A, T exponent) {
+    return elementwise(A, [exponent](T x){ return std::pow(x, exponent); }, "pow");
 }
 
 } // namespace numbits
