@@ -2,21 +2,17 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
+#include <cmath>
 
 using namespace numbits;
 
-/**
- * @brief Runs a sequence of tests for ndarray and statistical operations.
- *
- * Covers:
- * - Core ndarray operations: arithmetic, reshape, transpose, expand_dims, broadcast
- * - Mean, variance, stddev for 1D to 100D arrays
- * - Covariance and correlation matrices
- *
- * Aborts via assertion failure if any test fails.
- *
- * @return int Exit status: 0 on success.
- */
+// Helper: compute total number of elements from shape
+size_t total_size(const std::vector<size_t>& dims) {
+    size_t s = 1;
+    for (auto d : dims) s *= d;
+    return s;
+}
+
 int main() {
     // --------------------
     // Core ndarray tests
@@ -51,44 +47,48 @@ int main() {
         return ndarray<double>(dims, ptr);
     };
 
+    auto assert_almost_equal = [](double a, double b, double tol=1e-5){
+        assert(std::abs(a-b) < tol);
+    };
+
     // 1D
     ndarray<double> X1({5}, {1,2,3,4,5});
-    assert(mean(X1) == 3.0);
-    assert(std::abs(variance(X1) - 2.0) < 1e-5);
+    assert_almost_equal(mean(X1), 3.0);
+    assert_almost_equal(variance(X1), 2.0);
 
     // 4D
     std::vector<size_t> dims4{2,2,2,3};
-    std::vector<double> data4(24);
-    for(size_t i=0;i<24;i++) data4[i]=i+1;
+    std::vector<double> data4(total_size(dims4));
+    for(size_t i=0;i<data4.size();i++) data4[i]=i+1;
     auto X4 = make_ndarray(dims4, data4);
-    assert(mean(X4) == 12.5);
+    assert_almost_equal(mean(X4), sum(data4)/double(total_size(dims4)));
 
     // 8D
     std::vector<size_t> dims8{2,2,2,2,1,1,1,3};
-    std::vector<double> data8(24);
-    for(size_t i=0;i<24;i++) data8[i]=i+1;
+    std::vector<double> data8(total_size(dims8));
+    for(size_t i=0;i<data8.size();i++) data8[i]=i+1;
     auto X8 = make_ndarray(dims8, data8);
-    assert(mean(X8) == 12.5); // same as 4D, sum/data size
+    assert_almost_equal(mean(X8), sum(data8)/double(total_size(dims8)));
 
     // 10D
     std::vector<size_t> dims10{2,1,1,1,1,1,1,1,2,3};
-    std::vector<double> data10(12);
-    for(size_t i=0;i<12;i++) data10[i]=i+1;
+    std::vector<double> data10(total_size(dims10));
+    for(size_t i=0;i<data10.size();i++) data10[i]=i+1;
     auto X10 = make_ndarray(dims10, data10);
-    assert(mean(X10) == 6.5);
+    assert_almost_equal(mean(X10), sum(data10)/double(total_size(dims10)));
 
     // 14D
     std::vector<size_t> dims14{1,1,1,1,1,1,1,1,1,1,1,1,2,3};
-    std::vector<double> data14(6);
-    for(size_t i=0;i<6;i++) data14[i]=i+1;
+    std::vector<double> data14(total_size(dims14));
+    for(size_t i=0;i<data14.size();i++) data14[i]=i+1;
     auto X14 = make_ndarray(dims14, data14);
-    assert(mean(X14) == 3.5);
+    assert_almost_equal(mean(X14), sum(data14)/double(total_size(dims14)));
 
     // 100D
     std::vector<size_t> dims100(100,1);
-    std::vector<double> data100(1, 42.0);
+    std::vector<double> data100(total_size(dims100), 42.0);
     auto X100 = make_ndarray(dims100, data100);
-    assert(mean(X100) == 42.0);
+    assert_almost_equal(mean(X100), 42.0);
 
     std::cout << "N-D statistical tests passed.\n";
     std::cout << "All tests for NumBits v0.5 passed successfully.\n";
