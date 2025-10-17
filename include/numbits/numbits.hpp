@@ -1,6 +1,7 @@
 #pragma once
 #include "core/ndarray.hpp"
 #include "core/reshape.hpp"
+#include "core/utils.hpp"
 #include "ops/arithmetic.hpp"
 #include "ops/reduction.hpp"
 #include "ops/math.hpp"
