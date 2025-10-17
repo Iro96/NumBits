@@ -6,13 +6,6 @@
 
 using namespace numbits;
 
-// Helper: compute total number of elements from shape
-size_t total_size(const std::vector<size_t>& dims) {
-    size_t s = 1;
-    for (auto d : dims) s *= d;
-    return s;
-}
-
 int main() {
     // --------------------
     // Core ndarray tests
