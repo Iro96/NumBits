@@ -4,7 +4,7 @@
 
 <img src="docs/public/NumbitsIcon.png" height="30%" width="30%">
 
-[![CMake on multiple platforms](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml/badge.svg?branch=main)](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml)
+[![CMake on multiple platforms](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml)
 [![CodeQL Advanced](https://github.com/Iro96/NumBits/actions/workflows/codeql.yml/badge.svg)](https://github.com/Iro96/NumBits/actions/workflows/codeql.yml)
 ![Static Badge](https://img.shields.io/badge/version-v0.5-orange)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
