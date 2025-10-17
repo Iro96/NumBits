@@ -5,3 +5,7 @@ add_test(NAME test_core COMMAND test_core)
 add_executable(test_linalg test_linalg.cpp)
 target_link_libraries(test_linalg PRIVATE numbits)
 add_test(NAME test_linalg COMMAND test_linalg)
+
+add_executable(test_v05 test_v05.cpp)
+target_link_libraries(test_v05 PRIVATE numbits)
+add_test(NAME test_v05 COMMAND test_v05)
