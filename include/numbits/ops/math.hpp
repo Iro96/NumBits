@@ -58,9 +58,10 @@ ndarray<T> exp(const ndarray<T>& A) {
  */
 template <typename T>
 ndarray<T> sqrt(const ndarray<T>& A, T tol = 1e-12) {
-    return elementwise(A, [tol](T x){
+    const char* name = "sqrt";
+    return elementwise(A, [tol, name](T x){
         if (x < -tol)
-            throw std::domain_error("sqrt: negative input value");
+            throw std::domain_error(std::string(name) + ": negative input value");
         return std::sqrt(x < T(0) ? T(0) : x); // clamp tiny negatives to zero
     }, "sqrt");
 }
@@ -73,9 +74,10 @@ ndarray<T> sqrt(const ndarray<T>& A, T tol = 1e-12) {
  */
 template <typename T>
 ndarray<T> log(const ndarray<T>& A, T tol = 1e-12) {
-    return elementwise(A, [tol](T x){
+    const char* name = "log";
+    return elementwise(A, [tol, name](T x){
         if (x <= tol)
-            throw std::domain_error("log: input must be positive");
+            throw std::domain_error(std::string(name) + ": input must be positive");
         return std::log(x);
     }, "log");
 }
@@ -118,9 +120,10 @@ ndarray<T> tan(const ndarray<T>& A) {
 template <typename T, typename I,
           std::enable_if_t<std::is_integral_v<I>, int> = 0>
 ndarray<T> pow(const ndarray<T>& A, I exponent) {
-    return elementwise(A, [exp = exponent](T x) -> T {
+    const char* name = "pow";
+    return elementwise(A, [exp = exponent, name](T x) -> T {
         if (x == T(0) && exp < 0)
-            throw std::domain_error("pow: zero cannot be raised to a negative exponent");
+            throw std::domain_error(std::string(name) + ": zero cannot be raised to a negative exponent");
 
         T base = x, res = T(1);
         using U = std::make_unsigned_t<I>;
@@ -153,9 +156,10 @@ ndarray<T> pow(const ndarray<T>& A, I exponent) {
 template <typename T, typename F,
           std::enable_if_t<std::is_floating_point_v<F>, int> = 0>
 ndarray<T> pow(const ndarray<T>& A, F exponent) {
-    return elementwise(A, [exp = exponent](T x) -> T {
+    const char* name = "pow";
+    return elementwise(A, [exp = exponent, name](T x) -> T {
         if (x == T(0) && exp <= T(0))
-            throw std::domain_error("pow: zero cannot be raised to non-positive exponent");
+            throw std::domain_error(std::string(name) + ": zero cannot be raised to a negative exponent");
         return std::pow(x, exp);
     }, "pow");
 }
