@@ -4,7 +4,6 @@
 #include <type_traits>
 #include <stdexcept>
 #include <string>
-#include <utility>
 
 namespace numbits {
 
@@ -17,12 +16,17 @@ namespace numbits {
  * @param func Unary function to apply elementwise.
  * @param name Function name (for error messages).
  * @return ndarray<T> Result of applying func to each element of A.
+ *         If A is empty (size 0), returns an empty ndarray with the same shape.
+ *
+ * @note This preserves the shape of empty arrays, allowing consistent
+ *       behavior with broadcasting and shape-dependent operations.
+ */
  */
 template <typename T, typename Func>
 ndarray<T> elementwise(const ndarray<T>& A, const Func& func, const char* name) {
     static_assert(std::is_floating_point_v<T>,
                   "numbits::elementwise requires floating-point T");
-    using R = std::invoke_result_t<Func&, T>;
+    using R = std::invoke_result_t<Func, T>;
     static_assert(std::is_convertible_v<R, T>,
                   "numbits::elementwise: func(T) must return (or convert to) T");
 
@@ -121,6 +125,9 @@ ndarray<T> pow(const ndarray<T>& A, I exponent) {
 
         T base = x, res = T(1);
         using U = std::make_unsigned_t<I>;
+        // Convert negative exponent to unsigned for binary exponentiation.
+        // The expression -(exp + 1) + 1 avoids undefined behavior when exp == INT_MIN,
+        // because directly negating INT_MIN is undefined in C++.
         U n = (exp < 0) ? static_cast<U>(-(exp + 1)) + 1 : static_cast<U>(exp);
 
         while (n) {
