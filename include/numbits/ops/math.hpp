@@ -21,7 +21,6 @@ namespace numbits {
  * @note This preserves the shape of empty arrays, allowing consistent
  *       behavior with broadcasting and shape-dependent operations.
  */
- */
 template <typename T, typename Func>
 ndarray<T> elementwise(const ndarray<T>& A, const Func& func, const char* name) {
     static_assert(std::is_floating_point_v<T>,
