@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace numbits {
 
@@ -22,10 +23,11 @@ namespace numbits {
  *       behavior with broadcasting and shape-dependent operations.
  */
 template <typename T, typename Func>
-ndarray<T> elementwise(const ndarray<T>& A, const Func& func, const char* name) {
+ndarray<T> elementwise(const ndarray<T>& A, Func&& func) {
     static_assert(std::is_floating_point_v<T>,
                   "numbits::elementwise requires floating-point T");
-    using R = std::invoke_result_t<Func, T>;
+    using F = std::remove_reference_t<Func>;
+    using R = std::invoke_result_t<F&, T>;
     static_assert(std::is_convertible_v<R, T>,
                   "numbits::elementwise: func(T) must return (or convert to) T");
 
@@ -34,8 +36,10 @@ ndarray<T> elementwise(const ndarray<T>& A, const Func& func, const char* name) 
         return ndarray<T>(shape);  // preserve shape for empty arrays
 
     ndarray<T> B(shape);
-    for (size_t i = 0; i < A.size(); ++i)
-        B[i] = func(A[i]);
+    auto&& f = std::forward<Func>(func);
+    const size_t n = A.size();
+    for (size_t i = 0; i < n; ++i)
+        B[i] = f(A[i]);
 
     return B;
 }
@@ -45,7 +49,7 @@ ndarray<T> elementwise(const ndarray<T>& A, const Func& func, const char* name) 
  */
 template <typename T>
 ndarray<T> exp(const ndarray<T>& A) {
-    return elementwise(A, [](T x){ return std::exp(x); }, "exp");
+    return elementwise(A, [](T x){ return std::exp(x); });
 }
 
 /**
@@ -59,27 +63,29 @@ ndarray<T> exp(const ndarray<T>& A) {
 template <typename T>
 ndarray<T> sqrt(const ndarray<T>& A, T tol = 1e-12) {
     const char* name = "sqrt";
+    if (tol < T(0)) throw std::invalid_argument(std::string(name) + ": tol must be non-negative");
     return elementwise(A, [tol, name](T x){
         if (x < -tol)
             throw std::domain_error(std::string(name) + ": negative input value");
         return std::sqrt(x < T(0) ? T(0) : x); // clamp tiny negatives to zero
-    }, "sqrt");
+    });
 }
 
 /**
  * @brief Elementwise natural logarithm: B = log(A)
  *
- * @param tol Optional tolerance for values considered as positive (default 1e-12).
- * @throws std::domain_error if any element is <= tol.
+ * @param tol Optional tolerance below which values are treated as non‑positive (default 1e-12).
+ * @throws std::domain_error if any element is <= tol (i.e., requires x > tol).
  */
 template <typename T>
 ndarray<T> log(const ndarray<T>& A, T tol = 1e-12) {
     const char* name = "log";
+    if (tol < T(0)) throw std::invalid_argument(std::string(name) + ": tol must be non-negative");
     return elementwise(A, [tol, name](T x){
         if (x <= tol)
             throw std::domain_error(std::string(name) + ": input must be positive");
         return std::log(x);
-    }, "log");
+    });
 }
 
 /**
@@ -87,7 +93,7 @@ ndarray<T> log(const ndarray<T>& A, T tol = 1e-12) {
  */
 template <typename T>
 ndarray<T> sin(const ndarray<T>& A) {
-    return elementwise(A, [](T x){ return std::sin(x); }, "sin");
+    return elementwise(A, [](T x){ return std::sin(x); });
 }
 
 /**
@@ -95,7 +101,7 @@ ndarray<T> sin(const ndarray<T>& A) {
  */
 template <typename T>
 ndarray<T> cos(const ndarray<T>& A) {
-    return elementwise(A, [](T x){ return std::cos(x); }, "cos");
+    return elementwise(A, [](T x){ return std::cos(x); });
 }
 
 /**
@@ -103,7 +109,7 @@ ndarray<T> cos(const ndarray<T>& A) {
  */
 template <typename T>
 ndarray<T> tan(const ndarray<T>& A) {
-    return elementwise(A, [](T x){ return std::tan(x); }, "tan");
+    return elementwise(A, [](T x){ return std::tan(x); });
 }
 
 /**
@@ -139,7 +145,7 @@ ndarray<T> pow(const ndarray<T>& A, I exponent) {
         }
 
         return (exp >= 0) ? res : T(1) / res;
-    }, "pow");
+    });
 }
 
 /**
@@ -161,7 +167,7 @@ ndarray<T> pow(const ndarray<T>& A, F exponent) {
         if (x == T(0) && exp <= T(0))
             throw std::domain_error(std::string(name) + ": zero cannot be raised to a negative exponent");
         return std::pow(x, exp);
-    }, "pow");
+    });
 }
 
 } // namespace numbits
