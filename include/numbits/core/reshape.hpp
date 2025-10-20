@@ -29,7 +29,16 @@ ndarray<T> reshape(const ndarray<T>& A, const std::vector<size_t>& new_shape) {
         throw std::invalid_argument("reshape: shape dimensions must be > 0");
 
     size_t old_size = A.size();
-    size_t new_size = std::accumulate(new_shape.begin(), new_shape.end(), size_t{1}, std::multiplies<size_t>());
+    size_t new_size = 1;
+    for (size_t d : new_shape) {
+        if (d == 0) {
+            throw std::invalid_argument("reshape: shape dimensions must be > 0");
+        }
+        if (d > 0 && new_size > std::numeric_limits<size_t>::max() / d) {
+            throw std::invalid_argument("reshape: size overflow in shape product");
+        }
+        new_size *= d;
+    }
     if (old_size != new_size)
         throw std::invalid_argument("reshape: total size must remain the same");
 
