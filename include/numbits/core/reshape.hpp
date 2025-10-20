@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <numeric>
 #include <algorithm>
-#include <functional>  // for std::multiplies
+#include <functional>
 #include "ndarray.hpp"
 
 namespace numbits {
@@ -93,16 +93,20 @@ ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
 template <typename T>
 ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
     std::vector<size_t> new_shape = A.shape();
+
     if (axis >= 0) {
-        if (axis >= static_cast<int>(new_shape.size()))
+        const size_t uaxis = static_cast<size_t>(axis);
+        if (uaxis >= new_shape.size())
             throw std::invalid_argument("squeeze: axis out of bounds");
-        if (new_shape[axis] != 1)
+        if (new_shape[uaxis] != 1)
             throw std::invalid_argument("squeeze: cannot squeeze axis with size != 1");
-        new_shape.erase(new_shape.begin() + axis);
-        if (new_shape.empty()) new_shape.push_back(1);
+        new_shape.erase(new_shape.begin() + static_cast<std::ptrdiff_t>(uaxis));
+        if (new_shape.empty())
+            throw std::invalid_argument("squeeze: removing this axis would produce 0-D; not supported");
     } else {
         new_shape.erase(std::remove(new_shape.begin(), new_shape.end(), 1), new_shape.end());
-        if (new_shape.empty()) new_shape.push_back(1);
+        if (new_shape.empty())
+            throw std::invalid_argument("squeeze: removing all singleton axes would produce 0-D; not supported");
     }
     return ndarray<T>(new_shape, A.data_ptr());
 }
