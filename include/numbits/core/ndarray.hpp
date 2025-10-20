@@ -174,11 +174,26 @@ public:
     /**
      * @brief Const multi-dimensional access.
      */
-    template <typename... Idxs>
-    const T& operator()(Idxs... indices) const {
+        template <typename... Idxs>
+    T& operator()(Idxs... indices) {
         static_assert((std::is_convertible_v<Idxs, size_t> && ...), "All indices must be size_t");
-        std::vector<size_t> idxs{static_cast<size_t>(indices)...};
-        return (*data_)[flat_index(idxs)];
+        if (sizeof...(indices) != shape_.size()) {
+            throw std::invalid_argument("ndarray: number of indices does not match rank");
+        }
+
+        size_t flat_idx = 0;
+        size_t i = 0;
+        auto calculate_offset = [&](size_t idx) {
+            if (idx >= shape_[i]) {
+                throw std::out_of_range("ndarray: index out of bounds");
+            }
+            flat_idx += idx * strides_[i];
+            i++;
+        };
+
+        (calculate_offset(static_cast<size_t>(indices)), ...);
+
+        return (*data_)[flat_idx];
     }
 
     /**
