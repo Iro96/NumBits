@@ -156,8 +156,8 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
     }
 
     ndarray<T> B(new_shape);
-    auto src = A.data();
-    auto dst = B.data();
+    const auto& src = A.data();
+    auto& dst = B.data();
 
     // Prepare aligned shapes
     std::vector<size_t> src_shape = A.shape();
