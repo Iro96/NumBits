@@ -177,10 +177,10 @@ public:
     template <typename... Idxs>
     const T& operator()(Idxs... indices) const {
         static_assert((std::is_convertible_v<Idxs, size_t> && ...), "All indices must be size_t");
-    
-        if (sizeof...(indices) != shape_.size())
+        if (sizeof...(indices) != shape_.size()) {
             throw std::invalid_argument("ndarray: number of indices does not match rank");
-    
+        }
+        
         size_t flat_idx = 0;
         size_t i = 0;
         auto calculate_offset = [&](size_t idx) {
