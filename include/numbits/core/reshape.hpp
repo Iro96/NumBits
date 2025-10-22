@@ -7,6 +7,14 @@
 
 namespace numbits {
 
+// Utility function for checking if a shape is valid (non-empty and all dimensions > 0)
+inline void validate_shape(const std::vector<size_t>& shape) {
+    if (shape.empty())
+        throw std::invalid_argument("Shape cannot be empty");
+    if (std::any_of(shape.begin(), shape.end(), [](size_t d){ return d == 0; }))
+        throw std::invalid_argument("Shape dimensions must be > 0");
+}
+
 /**
  * @brief Reshape an ndarray to a new shape without copying data.
  *
@@ -23,17 +31,11 @@ namespace numbits {
  */
 template <typename T>
 ndarray<T> reshape(const ndarray<T>& A, const std::vector<size_t>& new_shape) {
-    if (new_shape.empty())
-        throw std::invalid_argument("reshape: shape cannot be empty");
-    if (std::any_of(new_shape.begin(), new_shape.end(), [](size_t d){ return d == 0; }))
-        throw std::invalid_argument("reshape: shape dimensions must be > 0");
+    validate_shape(new_shape);
 
     size_t old_size = A.size();
     size_t new_size = 1;
     for (size_t d : new_shape) {
-        if (d == 0) {
-            throw std::invalid_argument("reshape: shape dimensions must be > 0");
-        }
         if (d > 0 && new_size > std::numeric_limits<size_t>::max() / d) {
             throw std::invalid_argument("reshape: size overflow in shape product");
         }
@@ -151,10 +153,7 @@ ndarray<T> transpose(const ndarray<T>& A) {
  */
 template <typename T>
 ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_shape) {
-    if (target_shape.empty())
-        throw std::invalid_argument("broadcast_to: target shape cannot be empty");
-    if (std::any_of(target_shape.begin(), target_shape.end(), [](size_t d){ return d == 0; }))
-        throw std::invalid_argument("broadcast_to: shape dimensions must be > 0");
+    validate_shape(target_shape);
 
     const auto& orig_shape = A.shape();
     std::vector<size_t> new_shape = target_shape;
@@ -194,10 +193,9 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
             size_t coord = rem % dim;
             rem /= dim;
             if (ndim_dst - 1 - k >= dst_src_offset) {
-                size_t s_axis = (ndim_dst - 1 - k) - dst_src_offset;
-                size_t s_dim = src_shape[s_axis];
-                size_t s_coord = (s_dim == 1) ? 0 : coord;
-                src_flat += s_coord * src_strides[s_axis];
+                size_t s_axis = (ndim_dst - 1 - k - dst_src_offset);
+                if (src_shape[s_axis] != 1)
+                    src_flat += coord * src_strides[s_axis];
             }
         }
         dst[idx] = src[src_flat];
@@ -207,49 +205,38 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
 }
 
 /**
- * @brief Overload of broadcast_to() accepting an initializer list as the target shape.
- * @see broadcast_to(const ndarray<T>&, const std::vector<size_t>&)
+ * @brief Extract a 2D slice from the ndarray, specified by row and column indices.
+ *
+ * Extracts a 2D sub-array (slice) defined by rows [start_row, end_row) and
+ * columns [start_col, end_col) from a 2D ndarray.
+ *
+ * @tparam T Element type of the ndarray.
+ * @param A The input ndarray.
+ * @param start_row Starting row index (inclusive).
+ * @param end_row Ending row index (exclusive).
+ * @param start_col Starting column index (inclusive).
+ * @param end_col Ending column index (exclusive).
+ * @return ndarray<T> A new ndarray view of the sliced portion.
  */
 template <typename T>
-ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>& target_shape) {
-    return broadcast_to(A, std::vector<size_t>(target_shape));
-}
-
-/**
- * @brief Extracts a 2D subarray specified by row and column ranges.
- *
- * The row range is [row_start, row_end) and the column range is [col_start, col_end).
- * The returned array contains a copy of the selected region with shape {row_end - row_start, col_end - col_start}.
- *
- * @tparam T Element type.
- * @param A Input 2D array.
- * @param row_start Inclusive start index for rows.
- * @param row_end Exclusive end index for rows.
- * @param col_start Inclusive start index for columns.
- * @param col_end Exclusive end index for columns.
- * @return ndarray<T> A new 2D array containing the sliced region.
- *
- * @throws std::invalid_argument if the input is not 2D or if any start index is greater than its corresponding end index.
- * @throws std::out_of_range if any provided index is outside the bounds of the input array.
- */
-template <typename T>
-ndarray<T> slice(const ndarray<T>& A, size_t row_start, size_t row_end, size_t col_start, size_t col_end) {
+ndarray<T> slice(const ndarray<T>& A, size_t start_row, size_t end_row, size_t start_col, size_t end_col) {
     const auto& shape = A.shape();
     if (shape.size() != 2)
-        throw std::invalid_argument("slice: only 2D arrays supported");
-    if (row_start > row_end || col_start > col_end)
-        throw std::invalid_argument("slice: start must be <= end");
-    if (row_end > shape[0] || col_end > shape[1] || row_start >= shape[0] || col_start >= shape[1])
-        throw std::out_of_range("slice: indices out of bounds");
+        throw std::invalid_argument("slice: input array must be 2D");
+    
+    if (start_row >= end_row || end_row > shape[0] || start_col >= end_col || end_col > shape[1])
+        throw std::invalid_argument("slice: invalid slice boundaries");
 
-    size_t rows = row_end - row_start;
-    size_t cols = col_end - col_start;
-    ndarray<T> B({rows, cols});
-    for (size_t i = 0; i < rows; ++i)
-        for (size_t j = 0; j < cols; ++j)
-            B(i, j) = A(i + row_start, j + col_start);
+    std::vector<size_t> new_shape = {end_row - start_row, end_col - start_col};
+    ndarray<T> B(new_shape);
+
+    for (size_t i = start_row, r = 0; i < end_row; ++i, ++r) {
+        for (size_t j = start_col, c = 0; j < end_col; ++j, ++c) {
+            B(r, c) = A(i, j);
+        }
+    }
 
     return B;
 }
 
-} // namespace numbits
+}  // namespace numbits
