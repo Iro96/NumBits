@@ -224,7 +224,9 @@ ndarray<T> slice(const ndarray<T>& A, size_t start_row, size_t end_row, size_t s
     if (shape.size() != 2)
         throw std::invalid_argument("slice: input array must be 2D");
     
-    if (start_row >= end_row || end_row > shape[0] || start_col >= end_col || end_col > shape[1])
+    if (start_row >= end_row || start_col >= end_col ||
+        start_row >= shape[0] || end_row > shape[0] ||
+        start_col >= shape[1] || end_col > shape[1])
         throw std::invalid_argument("slice: invalid slice boundaries");
 
     std::vector<size_t> new_shape = {end_row - start_row, end_col - start_col};
