@@ -3,7 +3,9 @@
 #include <numeric>
 #include <algorithm>
 #include <functional>
+#include <limits>       // for std::numeric_limits
 #include "ndarray.hpp"
+#include "total_size.hpp" // optional: if you define numbits::total_size() elsewhere
 
 namespace numbits {
 
@@ -20,6 +22,16 @@ namespace numbits {
  * @throws std::invalid_argument if `new_shape` is empty.
  * @throws std::invalid_argument if any dimension in `new_shape` is zero.
  * @throws std::invalid_argument if the total number of elements in `new_shape` does not match the input array's size.
+ *
+ * @note The returned ndarray is a non-owning view sharing the same data pointer.
+ *       Ensure the source array remains alive for the lifetime of the view.
+ *
+ * @code
+ * ndarray<double> A({2, 3});
+ * auto B = numbits::reshape(A, {3, 2});
+ * // A.shape() == {2, 3}
+ * // B.shape() == {3, 2}
+ * @endcode
  */
 template <typename T>
 ndarray<T> reshape(const ndarray<T>& A, const std::vector<size_t>& new_shape) {
@@ -28,18 +40,8 @@ ndarray<T> reshape(const ndarray<T>& A, const std::vector<size_t>& new_shape) {
     if (std::any_of(new_shape.begin(), new_shape.end(), [](size_t d){ return d == 0; }))
         throw std::invalid_argument("reshape: shape dimensions must be > 0");
 
-    size_t old_size = A.size();
-    size_t new_size = 1;
-    for (size_t d : new_shape) {
-        if (d == 0) {
-            throw std::invalid_argument("reshape: shape dimensions must be > 0");
-        }
-        if (d > 0 && new_size > std::numeric_limits<size_t>::max() / d) {
-            throw std::invalid_argument("reshape: size overflow in shape product");
-        }
-        new_size *= d;
-    }
-    if (old_size != new_size)
+    // Validate total size consistency
+    if (A.size() != numbits::total_size(new_shape))
         throw std::invalid_argument("reshape: total size must remain the same");
 
     return ndarray<T>(new_shape, A.data_ptr());
@@ -67,9 +69,18 @@ ndarray<T> reshape(const ndarray<T>& A, const std::initializer_list<size_t>& new
  * @return ndarray<T> Array view with the new axis of length 1 inserted.
  *
  * @throws std::invalid_argument if `axis` is greater than the current rank.
+ *
+ * @note The returned ndarray is a view sharing the same data pointer.
+ *
+ * @code
+ * ndarray<int> A({2, 3});
+ * auto B = numbits::expand_dims(A, 0);
+ * // A.shape() == {2, 3}
+ * // B.shape() == {1, 2, 3}
+ * @endcode
  */
 template <typename T>
-ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
+constexpr ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
     std::vector<size_t> new_shape = A.shape();
     if (axis > new_shape.size())
         throw std::invalid_argument("expand_dims: axis out of bounds");
@@ -89,9 +100,17 @@ ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
  * @return ndarray<T> New view with singleton dimensions removed; if all dimensions are removed the result has shape {1}.
  *
  * @throws std::invalid_argument If `axis` is out of bounds or the specified axis does not have size 1.
+ *
+ * @note The returned ndarray is a view sharing the same data pointer.
+ *
+ * @code
+ * ndarray<int> A({1, 3, 1, 4});
+ * auto B = numbits::squeeze(A);     // shape {3, 4}
+ * auto C = numbits::squeeze(A, 2);  // remove axis 2 only
+ * @endcode
  */
 template <typename T>
-ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
+constexpr ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
     std::vector<size_t> new_shape = A.shape();
 
     if (axis >= 0) {
@@ -119,6 +138,12 @@ ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
  * @return ndarray<T> A new array with shape {cols, rows} where element (j,i) is copied from A(i,j).
  *
  * @throws std::invalid_argument if A is not 2D.
+ *
+ * @code
+ * ndarray<double> A({2, 3});
+ * auto B = numbits::transpose(A);
+ * // A(i, j) == B(j, i)
+ * @endcode
  */
 template <typename T>
 ndarray<T> transpose(const ndarray<T>& A) {
@@ -135,19 +160,23 @@ ndarray<T> transpose(const ndarray<T>& A) {
 /**
  * @brief Broadcasts an array to a larger target shape by expanding size-1 dimensions.
  *
- * Creates a new ndarray with the specified target_shape where dimensions of size 1
- * in the source are replicated to match the corresponding target dimensions; data is
- * copied into the new array according to standard broadcasting rules.
+ * Creates a new ndarray with the specified `target_shape` where dimensions of size 1
+ * in the source are replicated to match the corresponding target dimensions.
  *
  * @tparam T Element type.
  * @param A Source array to broadcast.
  * @param target_shape Desired shape to broadcast to; must have length >= A.shape().size().
  * @return ndarray<T> Array with shape equal to `target_shape` containing broadcasted values from `A`.
  *
- * @throws std::invalid_argument if `target_shape` is empty.
- * @throws std::invalid_argument if any dimension in `target_shape` is zero.
+ * @throws std::invalid_argument if `target_shape` is empty or has zero dimensions.
  * @throws std::invalid_argument if `target_shape` has fewer dimensions than `A`.
  * @throws std::invalid_argument if any non-singleton dimension of `A` is incompatible with the corresponding target dimension.
+ *
+ * @code
+ * ndarray<int> A({1, 3});
+ * auto B = numbits::broadcast_to(A, {4, 3});
+ * // B(i, j) == A(0, j)
+ * @endcode
  */
 template <typename T>
 ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_shape) {
@@ -157,34 +186,29 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
         throw std::invalid_argument("broadcast_to: shape dimensions must be > 0");
 
     const auto& orig_shape = A.shape();
-    std::vector<size_t> new_shape = target_shape;
-
-    if (orig_shape.size() > new_shape.size())
+    if (orig_shape.size() > target_shape.size())
         throw std::invalid_argument("broadcast_to: target shape must have >= number of dimensions");
 
-    size_t align_offset = new_shape.size() - orig_shape.size();
+    size_t align_offset = target_shape.size() - orig_shape.size();
     for (size_t i = 0; i < orig_shape.size(); ++i) {
-        if (orig_shape[i] != 1 && orig_shape[i] != new_shape[i + align_offset])
+        if (orig_shape[i] != 1 && orig_shape[i] != target_shape[i + align_offset])
             throw std::invalid_argument("broadcast_to: incompatible shapes");
     }
 
-    ndarray<T> B(new_shape);
+    ndarray<T> B(target_shape);
     const auto& src = A.data();
     auto& dst = B.data();
 
-    // Prepare aligned shapes
     std::vector<size_t> src_shape = A.shape();
     std::vector<size_t> dst_shape = B.shape();
     size_t ndim_dst = dst_shape.size();
     size_t ndim_src = src_shape.size();
     size_t dst_src_offset = ndim_dst - ndim_src;
 
-    // Compute strides for source in row-major
+    // Compute strides for source (row-major)
     std::vector<size_t> src_strides(ndim_src, 1);
-    if (ndim_src >= 2) {
-        for (int i = int(ndim_src) - 2; i >= 0; --i)
-            src_strides[i] = src_strides[i + 1] * src_shape[i + 1];
-    }
+    for (int i = int(ndim_src) - 2; i >= 0; --i)
+        src_strides[i] = src_strides[i + 1] * src_shape[i + 1];
 
     for (size_t idx = 0; idx < B.size(); ++idx) {
         size_t rem = idx;
@@ -231,6 +255,12 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::initializer_list<size_t>
  *
  * @throws std::invalid_argument if the input is not 2D or if any start index is greater than its corresponding end index.
  * @throws std::out_of_range if any provided index is outside the bounds of the input array.
+ *
+ * @code
+ * ndarray<int> A({4, 5});
+ * auto sub = numbits::slice(A, 1, 3, 0, 2);
+ * // sub.shape() == {2, 2}
+ * @endcode
  */
 template <typename T>
 ndarray<T> slice(const ndarray<T>& A, size_t row_start, size_t row_end, size_t col_start, size_t col_end) {
@@ -239,7 +269,7 @@ ndarray<T> slice(const ndarray<T>& A, size_t row_start, size_t row_end, size_t c
         throw std::invalid_argument("slice: only 2D arrays supported");
     if (row_start > row_end || col_start > col_end)
         throw std::invalid_argument("slice: start must be <= end");
-    if (row_end > shape[0] || col_end > shape[1] || row_start >= shape[0] || col_start >= shape[1])
+    if (row_end > shape[0] || col_end > shape[1])
         throw std::out_of_range("slice: indices out of bounds");
 
     size_t rows = row_end - row_start;
