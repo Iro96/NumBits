@@ -40,6 +40,9 @@ We welcome contributions from everyone! For detailed guidelines on how to contri
 
 ## How To Use
 
+> [!NOTE]
+> Use C++17 or higher for compile
+
 ### 1. How to compile
 
 #### Clone the repository
