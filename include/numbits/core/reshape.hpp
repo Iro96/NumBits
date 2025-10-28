@@ -3,9 +3,9 @@
 #include <numeric>
 #include <algorithm>
 #include <functional>
-#include <limits>       // for std::numeric_limits
+#include <limits>
 #include "ndarray.hpp"
-#include "total_size.hpp" // optional: if you define numbits::total_size() elsewhere
+#include "utils.hpp"
 
 namespace numbits {
 
