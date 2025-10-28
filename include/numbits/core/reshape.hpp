@@ -5,7 +5,7 @@
 #include <functional>
 #include <limits>
 #include "ndarray.hpp"
-#include "utils.hpp"
+#include "shape.hpp"
 
 namespace numbits {
 
