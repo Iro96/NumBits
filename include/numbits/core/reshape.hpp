@@ -35,8 +35,6 @@ namespace numbits {
  */
 template <typename T>
 ndarray<T> reshape(const ndarray<T>& A, const std::vector<size_t>& new_shape) {
-    if (new_shape.empty())
-        throw std::invalid_argument("reshape: shape cannot be empty");
     if (std::any_of(new_shape.begin(), new_shape.end(), [](size_t d){ return d == 0; }))
         throw std::invalid_argument("reshape: shape dimensions must be > 0");
 
@@ -81,11 +79,11 @@ ndarray<T> reshape(const ndarray<T>& A, const std::initializer_list<size_t>& new
  */
 template <typename T>
 constexpr ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
-    std::vector<size_t> new_shape = A.shape();
-    if (axis > new_shape.size())
+    auto shape_vec = A.shape();
+    if (axis > shape_vec.size())
         throw std::invalid_argument("expand_dims: axis out of bounds");
-    new_shape.insert(new_shape.begin() + axis, 1);
-    return ndarray<T>(new_shape, A.data_ptr());
+    shape_vec.insert(shape_vec.begin() + axis, 1);
+    return ndarray<T>(shape_vec, A.data_ptr());
 }
 
 /**
@@ -111,7 +109,7 @@ constexpr ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
  */
 template <typename T>
 constexpr ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
-    std::vector<size_t> new_shape = A.shape();
+    auto new_shape = A.shape();
 
     if (axis >= 0) {
         const size_t uaxis = static_cast<size_t>(axis);
@@ -185,6 +183,14 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
     if (std::any_of(target_shape.begin(), target_shape.end(), [](size_t d){ return d == 0; }))
         throw std::invalid_argument("broadcast_to: shape dimensions must be > 0");
 
+    // Check for overflow in target shape product
+    size_t target_size = 1;
+    for (size_t dim : target_shape) {
+        if (dim > std::numeric_limits<size_t>::max() / target_size)
+            throw std::overflow_error("broadcast_to: target shape product overflow");
+        target_size *= dim;
+    }
+
     const auto& orig_shape = A.shape();
     if (orig_shape.size() > target_shape.size())
         throw std::invalid_argument("broadcast_to: target shape must have >= number of dimensions");
@@ -195,36 +201,54 @@ ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& target_s
             throw std::invalid_argument("broadcast_to: incompatible shapes");
     }
 
-    ndarray<T> B(target_shape);
+    // Precompute repetition patterns for each axis
+    std::vector<size_t> repetitions(target_shape.size());
+    for (size_t i = 0; i < target_shape.size(); ++i) {
+        if (i < align_offset) {
+            repetitions[i] = target_shape[i];
+        } else {
+            size_t src_dim = orig_shape[i - align_offset];
+            repetitions[i] = (src_dim == 1) ? target_shape[i] : 1;
+        }
+    }
+
+    // Compute strides for target shape with overflow check
+    std::vector<size_t> target_strides_vec(target_shape.size());
+    if (!target_shape.empty()) {
+        target_strides_vec.back() = 1;
+        for (std::ptrdiff_t i = static_cast<std::ptrdiff_t>(target_shape.size()) - 2; i >= 0; --i) {
+            if (target_shape[i + 1] > std::numeric_limits<size_t>::max() / target_strides_vec[i + 1])
+                throw std::overflow_error("broadcast_to: stride computation overflow");
+            target_strides_vec[i] = target_strides_vec[i + 1] * target_shape[i + 1];
+        }
+    }
+    auto target_strides = std::make_shared<std::vector<size_t>>(target_strides_vec);
+
+    ndarray<T> B(target_shape, target_strides, A.data_ptr());
     const auto& src = A.data();
-    auto& dst = B.data();
+    auto& dst = const_cast<std::vector<T>&>(B.data());
 
-    std::vector<size_t> src_shape = A.shape();
-    std::vector<size_t> dst_shape = B.shape();
-    size_t ndim_dst = dst_shape.size();
-    size_t ndim_src = src_shape.size();
-    size_t dst_src_offset = ndim_dst - ndim_src;
+    // Use row-major contiguous loops for innermost dimensions
+    size_t total_size = B.size();
+    size_t inner_dim = target_shape.back();
+    size_t outer_size = total_size / inner_dim;
 
-    // Compute strides for source (row-major)
-    std::vector<size_t> src_strides(ndim_src, 1);
-    for (int i = int(ndim_src) - 2; i >= 0; --i)
-        src_strides[i] = src_strides[i + 1] * src_shape[i + 1];
-
-    for (size_t idx = 0; idx < B.size(); ++idx) {
-        size_t rem = idx;
-        size_t src_flat = 0;
-        for (size_t k = 0; k < ndim_dst; ++k) {
-            size_t dim = dst_shape[ndim_dst - 1 - k];
-            size_t coord = rem % dim;
-            rem /= dim;
-            if (ndim_dst - 1 - k >= dst_src_offset) {
-                size_t s_axis = (ndim_dst - 1 - k) - dst_src_offset;
-                size_t s_dim = src_shape[s_axis];
+    for (size_t outer = 0; outer < outer_size; ++outer) {
+        size_t src_idx = 0;
+        size_t temp = outer;
+        for (size_t k = 0; k < target_shape.size() - 1; ++k) {
+            size_t coord = temp % target_shape[k];
+            temp /= target_shape[k];
+            if (k >= align_offset) {
+                size_t s_axis = k - align_offset;
+                size_t s_dim = orig_shape[s_axis];
                 size_t s_coord = (s_dim == 1) ? 0 : coord;
-                src_flat += s_coord * src_strides[s_axis];
+                src_idx += s_coord * (*A.strides())[s_axis];
             }
         }
-        dst[idx] = src[src_flat];
+        for (size_t inner = 0; inner < inner_dim; ++inner) {
+            dst[outer * inner_dim + inner] = src[src_idx];
+        }
     }
 
     return B;

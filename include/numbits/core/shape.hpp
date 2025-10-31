@@ -26,7 +26,7 @@ namespace numbits {
  * @note This function detects overflow to avoid wrap-around when very large shapes are used.
  * @note An empty `shape` corresponds to a scalar or 0-D array and returns 1.
  */
-constexpr size_t total_size(const std::vector<size_t>& shape) {
+size_t total_size(const std::vector<size_t>& shape) {
     size_t total = 1;
     for (size_t dim : shape) {
         if (dim != 0 && total > std::numeric_limits<size_t>::max() / dim)

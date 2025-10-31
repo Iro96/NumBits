@@ -53,7 +53,8 @@ ndarray<T> rand(const std::initializer_list<size_t>& shape) {
                                                                static_cast<T>(1.0));
     auto& gen = detail::global_rng();
 
-    for (auto& v : A.data())
+    auto& data = const_cast<std::vector<T>&>(A.data());
+    for (auto& v : data)
         v = dist(gen);
 
     return A;
@@ -88,7 +89,8 @@ ndarray<T> randn(const std::initializer_list<size_t>& shape,
     std::normal_distribution<T> dist(mean, stddev);
     auto& gen = detail::global_rng();
 
-    for (auto& v : A.data())
+    auto& data = const_cast<std::vector<T>&>(A.data());
+    for (auto& v : data)
         v = dist(gen);
 
     return A;
