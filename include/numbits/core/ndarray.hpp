@@ -9,8 +9,6 @@
 #include <type_traits>
 #include <memory>
 #include <tuple>
-#include <memory>
-#include <tuple>
 
 namespace numbits {
 
@@ -128,30 +126,26 @@ public:
         if (arr.shape_.empty()) return os << "ndarray(shape=())";
 
         const auto& s = arr.shape_;
+        const auto& strides = arr.strides_;
         const auto* data_ptr = arr.data_->data();
 
-        std::function<void(size_t, size_t, size_t)> print_rec;
-        print_rec = [&](size_t offset, size_t dim, size_t stride) {
+        auto print_rec = [&](auto&& self, size_t offset, size_t dim) -> void {
             if (dim == s.size() - 1) {
                 os << "[ ";
                 for (size_t i = 0; i < s[dim]; ++i)
-                    os << data_ptr[offset + i * stride] << " ";
+                    os << data_ptr[offset + i * strides[dim]] << " ";
                 os << "]";
             } else {
                 os << "[";
                 for (size_t i = 0; i < s[dim]; ++i) {
-                    print_rec(offset + i * stride, dim + 1, stride / s[dim + 1]);
+                    self(self, offset + i * strides[dim], dim + 1);
                     if (i + 1 < s[dim]) os << ", ";
                 }
                 os << "]";
             }
         };
 
-        size_t total_stride = 1;
-        for (size_t i = s.size() - 1; i-- > 0;)
-            total_stride *= s[i + 1];
-
-        print_rec(0, 0, total_stride);
+        print_rec(print_rec, 0, 0);
         return os;
     }
 
