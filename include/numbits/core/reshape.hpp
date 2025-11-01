@@ -26,7 +26,7 @@ inline ndarray<T> reshape(const ndarray<T>& A, const std::initializer_list<size_
 }
 
 template <typename T>
-constexpr inline ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
+inline ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
     std::vector<size_t> new_shape = A.shape();
     if (axis > new_shape.size())
         throw std::invalid_argument("expand_dims: axis out of bounds");
@@ -35,7 +35,7 @@ constexpr inline ndarray<T> expand_dims(const ndarray<T>& A, size_t axis) {
 }
 
 template <typename T>
-constexpr inline ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
+inline ndarray<T> squeeze(const ndarray<T>& A, int axis = -1) {
     std::vector<size_t> new_shape = A.shape();
     if (axis >= 0) {
         const size_t uaxis = static_cast<size_t>(axis);
