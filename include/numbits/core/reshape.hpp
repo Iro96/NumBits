@@ -94,7 +94,7 @@ inline ndarray<T> broadcast_to(const ndarray<T>& A, const std::vector<size_t>& t
     const size_t ndim_dst = dst_shape.size(), ndim_src = src_shape.size(), dst_src_offset = ndim_dst - ndim_src;
 
     std::vector<size_t> src_strides(ndim_src, 1);
-    for (int i = int(ndim_src) - 2; i >= 0; --i)
+    for (std::ptrdiff_t i = static_cast<std::ptrdiff_t>(ndim_src) - 2; i >= 0; --i)
         src_strides[i] = src_strides[i + 1] * src_shape[i + 1];
 
     for (size_t idx = 0; idx < B.size(); ++idx) {
