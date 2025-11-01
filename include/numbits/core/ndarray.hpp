@@ -9,7 +9,8 @@
 #include <type_traits>
 #include <memory>
 #include <tuple>
-#include <functional>
+#include <memory>
+#include <tuple>
 
 namespace numbits {
 
