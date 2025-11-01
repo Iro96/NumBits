@@ -48,6 +48,18 @@ double mean(const ndarray<T>& A) {
  * @throws std::overflow_error if the mean cannot fit into T
  */
 template <typename T>
+/**
+ * @brief Compute the arithmetic mean of an integral ndarray and return it truncated to the element type.
+ *
+ * Computes the average of all elements in A using a widened accumulator and returns the integer quotient
+ * obtained by discarding any fractional part (truncation). The template parameter T must be an integral type.
+ *
+ * @tparam T Element type of the ndarray; must be an integral type.
+ * @param A Input ndarray whose elements will be averaged.
+ * @return T The truncated mean (fractional part removed) cast to type T.
+ * @throws std::domain_error If A is empty.
+ * @throws std::overflow_error If the truncated mean cannot be represented in type T.
+ */
 std::enable_if_t<std::is_integral_v<T>, T>
 mean_truncated(const ndarray<T>& A) {
     if (A.size() == 0)
