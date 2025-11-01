@@ -63,3 +63,17 @@ path_to_your_output
 
 > [!NOTE]
 > Please see in `./examples/*.cpp`
+
+---
+
+### *Citation*
+
+```bibtex
+@misc{iro96_numbits_2025,
+  author       = {Iro96},
+  title        = {NumBits: A Lightweight C++ Numerical Computing Library},
+  year         = {2025},
+  howpublished = {\url{https://github.com/Iro96/NumBits}},
+  note         = {Version 0.5}
+}
+```
