@@ -18,10 +18,10 @@ inline auto sum(const std::vector<T>& data) noexcept {
 }
 
 template <typename T>
-inline double mean(const std::vector<T>& data) noexcept {
-    const size_t n = data.size();
-    if (n == 0) return 0.0;
-    return static_cast<double>(sum(data)) / static_cast<double>(n);
+double mean(const std::vector<T>& data) {
+    if (data.empty())
+        throw std::domain_error("mean: cannot compute mean of empty vector");
+    return static_cast<double>(sum(data)) / static_cast<double>(data.size());
 }
 
 } // namespace numbits
