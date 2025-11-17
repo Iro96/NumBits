@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ndarray.hpp"
+#include "broadcasting.hpp"
 #include <vector>
 #include <stdexcept>
 
@@ -134,4 +135,5 @@ ndarray<T> slice_1d(const ndarray<T>& arr, size_t start, size_t stop, size_t ste
 }
 
 } // namespace numbits
+
 
