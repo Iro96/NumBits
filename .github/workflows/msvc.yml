@@ -55,12 +55,13 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           languages: 'cpp'
+          cli-version: latest
 
       # Merge SARIF files to ensure only one run per category
       - name: Merge SARIF files
         run: |
           codeql sarif merge ${{ steps.run-analysis.outputs.sarif }} --output ${{ env.build }}/merged-results.sarif
-        shell: bash
+        shell: pwsh
 
       # Upload merged SARIF to GitHub Code Scanning
       - name: Upload merged SARIF
