@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstddef>
 #include <initializer_list>
+#include <cstdint>
 #include <stdexcept>
 #include <type_traits>
 
@@ -17,6 +18,9 @@ enum class DType {
     INT32,
     INT64,
     UINT8,
+    UINT16,
+    UINT32,
+    UINT64,
     BOOL
 };
 
@@ -27,6 +31,9 @@ constexpr DType dtype_from_type() {
     else if constexpr (std::is_same_v<T, int32_t>) return DType::INT32;
     else if constexpr (std::is_same_v<T, int64_t>) return DType::INT64;
     else if constexpr (std::is_same_v<T, uint8_t>) return DType::UINT8;
+    else if constexpr (std::is_same_v<T, uint16_t>) return DType::UINT16;
+    else if constexpr (std::is_same_v<T, uint32_t>) return DType::UINT32;
+    else if constexpr (std::is_same_v<T, uint64_t>) return DType::UINT64;
     else if constexpr (std::is_same_v<T, bool>) return DType::BOOL;
     else static_assert(std::is_same_v<T, void>, "Unsupported type");
 }
@@ -39,10 +46,12 @@ template<> struct dtype_to_type<DType::FLOAT64> { using type = double; };
 template<> struct dtype_to_type<DType::INT32> { using type = int32_t; };
 template<> struct dtype_to_type<DType::INT64> { using type = int64_t; };
 template<> struct dtype_to_type<DType::UINT8> { using type = uint8_t; };
+template<> struct dtype_to_type<DType::UINT16> { using type = uint16_t; };
+template<> struct dtype_to_type<DType::UINT32> { using type = uint32_t; };
+template<> struct dtype_to_type<DType::UINT64> { using type = uint64_t; };
 template<> struct dtype_to_type<DType::BOOL> { using type = bool; };
 
 using Shape = std::vector<size_t>;
 using Strides = std::vector<size_t>;
 
 } // namespace numbits
-
