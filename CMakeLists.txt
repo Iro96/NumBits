@@ -74,5 +74,3 @@ install(EXPORT NumBitsTargets
     NAMESPACE NumBits::
     DESTINATION lib/cmake/NumBits
 )
-
-
