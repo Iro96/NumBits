@@ -14,22 +14,22 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Source files
 set(NUMBITS_SOURCES
-    src/array.cpp
+    src/ndarray.cpp
     src/operations.cpp
     src/math_functions.cpp
     src/linear_algebra.cpp
     src/broadcasting.cpp
-    src/array_manipulation.cpp
+    src/ndarray_manipulation.cpp
     src/indexing.cpp
 )
 
 set(NUMBITS_HEADERS
-    include/numbits/array.hpp
+    include/numbits/ndarray.hpp
     include/numbits/operations.hpp
     include/numbits/math_functions.hpp
     include/numbits/linear_algebra.hpp
     include/numbits/broadcasting.hpp
-    include/numbits/array_manipulation.hpp
+    include/numbits/ndarray_manipulation.hpp
     include/numbits/indexing.hpp
     include/numbits/io.hpp
     include/numbits/types.hpp
@@ -74,4 +74,5 @@ install(EXPORT NumBitsTargets
     NAMESPACE NumBits::
     DESTINATION lib/cmake/NumBits
 )
+
 
