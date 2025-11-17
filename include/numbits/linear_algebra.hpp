@@ -110,7 +110,7 @@ T determinant(const ndarray<T>& arr) {
         
         for (size_t j = 0; j < n; ++j) {
             // Create submatrix
-            ndarray<T> submatrix({n - 1, n - 1});
+            ndarray<T> submatrix(Shape{n - 1, n - 1});
             for (size_t i = 1; i < n; ++i) {
                 size_t col_idx = 0;
                 for (size_t k = 0; k < n; ++k) {
@@ -155,12 +155,12 @@ ndarray<T> inverse(const ndarray<T>& arr) {
         return result;
     } else {
         // For larger matrices, use adjugate method
-        ndarray<T> adjugate({n, n});
+        ndarray<T> adjugate(Shape{n, n});
         
         for (size_t i = 0; i < n; ++i) {
             for (size_t j = 0; j < n; ++j) {
                 // Create cofactor matrix
-                ndarray<T> cofactor({n - 1, n - 1});
+                ndarray<T> cofactor(Shape{n - 1, n - 1});
                 size_t row_idx = 0;
                 for (size_t ii = 0; ii < n; ++ii) {
                     if (ii == i) continue;
@@ -197,4 +197,5 @@ T trace(const ndarray<T>& arr) {
 }
 
 } // namespace numbits
+
 
