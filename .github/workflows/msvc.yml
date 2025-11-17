@@ -52,7 +52,7 @@ jobs:
 
       # Installs the CodeQL CLI on the runner
       - name: Setup CodeQL CLI
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: 'cpp'
 
