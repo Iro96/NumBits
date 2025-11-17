@@ -50,6 +50,12 @@ jobs:
           cmakeBuildDirectory: ${{ env.build }}
           ruleset: NativeRecommendedRules.ruleset
 
+      # Installs the CodeQL CLI on the runner
+      - name: Setup CodeQL CLI
+        uses: github/codeql-action/init@v3
+        with:
+          languages: 'cpp'
+
       # Merge SARIF files to ensure only one run per category
       - name: Merge SARIF files
         run: |
