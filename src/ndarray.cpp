@@ -1,8 +1,9 @@
 // Array implementation
 // Most functionality is template-based and in the header file
 
-#include "numbits/array.hpp"
+#include "numbits/ndarray.hpp"
 
 namespace numbits {
     // Non-template implementation can go here if needed
 }
+
