@@ -6,6 +6,7 @@
 #include <vector>
 #include <initializer_list>
 #include <algorithm>
+#include <cstdint>
 #include <stdexcept>
 #include <iostream>
 #include <string>
@@ -289,3 +290,4 @@ using ndarrayu64 = ndarray<uint64_t>;
 
 
 } // namespace numbits
+
