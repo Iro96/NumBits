@@ -19,6 +19,10 @@ A comprehensive NumPy-like library written entirely in C++17. NumBits provides m
 - **Scalar Operations**: Operations with scalar values
 - **Comparison Operations**: Equal, not equal, less, greater, less_equal, greater_equal
 - **Reduction Operations**: Sum, mean, min, max
+- **Extrema Utilities**: Flat `argmax`/`argmin` helpers to retrieve indices
+- **Value Clipping**: NumPy-style `clip` with support for scalar or broadcasted bounds
+- **Logical Utilities**: `logical_and`, `logical_or`, `logical_xor`, `logical_not`, plus boolean reductions `all`/`any`
+- **Cumulative Math**: `cumsum` and `cumprod` mirroring NumPy’s running operations
 
 ### 3. Broadcasting
 
@@ -52,6 +56,11 @@ A comprehensive NumPy-like library written entirely in C++17. NumBits provides m
 - **Element Access**: Multi-dimensional indexing
 - **Advanced Indexing**: Boolean indexing, advanced indexing
 - **Slicing**: Extract subarrays using slicing operations
+
+### 8. Array Creation
+
+- **Sequence Generation**: `arange` for evenly spaced steps and `linspace` for fixed-length ranges with optional endpoints
+- **Identity Matrices**: `eye` with optional rectangular shape and diagonal offset
 
 ---
 
@@ -186,6 +195,21 @@ Array<float> b({3}, {10.0f, 20.0f, 30.0f});
 
 // Automatic broadcasting
 auto c = a + b;  // b is broadcasted to match a's shape
+
+// Clip values similar to NumPy's np.clip
+auto clamped = clip(c, 0.0f, 25.0f);
+
+// Conditional blend
+ndarray<bool> mask({2, 3}, {true, false, true, false, true, false});
+auto blended = where(mask, c, clamped);
+
+// Locate the flat index of the largest entry
+auto max_idx = argmax(blended);
+
+// Check conditions and running totals
+auto positives = logical_and(blended, blended);
+bool any_large = any(blended > 20.0f);
+auto partial_sums = cumsum(blended);
 ```
 
 ---

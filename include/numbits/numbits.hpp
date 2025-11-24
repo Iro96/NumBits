@@ -10,6 +10,7 @@
 #include "numbits/math_functions.hpp"
 #include "numbits/linear_algebra.hpp"
 #include "numbits/ndarray_manipulation.hpp"
+#include "numbits/creation.hpp"
 #include "numbits/indexing.hpp"
 #include "numbits/random.hpp"
 #include "numbits/io.hpp"

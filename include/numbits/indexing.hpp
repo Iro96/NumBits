@@ -56,11 +56,10 @@ ndarray<T> take(const ndarray<T>& arr, const std::vector<size_t>& indices, size_
 // Boolean indexing
 template<typename T>
 ndarray<T> where(const ndarray<bool>& condition, const ndarray<T>& x, const ndarray<T>& y) {
-    if (x.shape() != y.shape()) {
-        throw std::runtime_error("x and y must have the same shape");
-    }
+    // Determine a common broadcast shape across all operands, matching NumPy semantics.
+    Shape xy_shape = broadcast_shapes(x.shape(), y.shape());
+    Shape broadcast_shape = broadcast_shapes(condition.shape(), xy_shape);
     
-    Shape broadcast_shape = broadcast_shapes(condition.shape(), x.shape());
     ndarray<bool> cond_broadcast = broadcast_to(condition, broadcast_shape);
     ndarray<T> x_broadcast = broadcast_to(x, broadcast_shape);
     ndarray<T> y_broadcast = broadcast_to(y, broadcast_shape);

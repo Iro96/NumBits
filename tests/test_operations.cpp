@@ -49,12 +49,113 @@ TEST_CASE(test_mean_reduction) {
     assert(mean(a) == 5.0f);
 }
 
+TEST_CASE(test_where_broadcasting) {
+    ndarray<bool> condition({2, 1}, {true, false});
+    ndarray<float> x({1, 3}, {1.0f, 2.0f, 3.0f});
+    ndarray<float> y({}, {0.0f});
+
+    auto result = where(condition, x, y);
+    assert((result.shape() == Shape{2, 3}));
+    assert(result[0] == 1.0f);
+    assert(result[1] == 2.0f);
+    assert(result[2] == 3.0f);
+    assert(result[3] == 0.0f);
+    assert(result[4] == 0.0f);
+    assert(result[5] == 0.0f);
+}
+
+TEST_CASE(test_clip_scalar) {
+    ndarray<float> values({4}, {-1.0f, 0.25f, 0.75f, 2.0f});
+    auto clipped = clip(values, 0.0f, 1.0f);
+    assert(clipped[0] == 0.0f);
+    assert(clipped[1] == 0.25f);
+    assert(clipped[2] == 0.75f);
+    assert(clipped[3] == 1.0f);
+}
+
+TEST_CASE(test_clip_broadcast) {
+    ndarray<float> values({2, 2}, {-1.0f, 0.2f, 1.2f, 0.4f});
+    ndarray<float> mins({1, 2}, {0.0f, 0.1f});
+    ndarray<float> maxs({2, 1}, {0.5f, 0.9f});
+    auto clipped = clip(values, mins, maxs);
+    assert((clipped.shape() == Shape{2, 2}));
+    assert(clipped[0] == 0.0f);
+    assert(clipped[1] == 0.2f);
+    assert(clipped[2] == 0.5f);
+    assert(clipped[3] == 0.4f);
+}
+
+TEST_CASE(test_argmax_argmin) {
+    ndarray<int> values({5}, {3, 1, 7, 7, -2});
+    auto max_index = argmax(values);
+    auto min_index = argmin(values);
+    assert(max_index == 2 || max_index == 3);
+    assert(min_index == 4);
+}
+
+TEST_CASE(test_logical_operations) {
+    ndarray<int> lhs({2, 2}, {0, 1, 2, 0});
+    ndarray<int> rhs({1, 2}, {0, 1});
+
+    auto land = logical_and(lhs, rhs);
+    auto lor = logical_or(lhs, rhs);
+    auto lxor = logical_xor(lhs, rhs);
+    auto lnot = logical_not(lhs);
+
+    assert((land.shape() == Shape{2, 2}));
+    assert(land[0] == false);
+    assert(land[1] == true);
+    assert(land[2] == false);
+    assert(land[3] == false);
+
+    assert(lor[0] == false);
+    assert(lor[1] == true);
+    assert(lor[2] == true);
+    assert(lor[3] == true);
+
+    assert(lxor[0] == false);
+    assert(lxor[1] == false);
+    assert(lxor[2] == true);
+    assert(lxor[3] == true);
+
+    assert(lnot[0] == true);
+    assert(lnot[1] == false);
+    assert(lnot[2] == false);
+    assert(lnot[3] == true);
+}
+
+TEST_CASE(test_all_any) {
+    ndarray<int> values({4}, {1, 2, 0, 3});
+    assert(all(values) == false);
+    assert(any(values) == true);
+
+    ndarray<int> zeros({3}, {0, 0, 0});
+    assert(all(zeros) == false);
+    assert(any(zeros) == false);
+}
+
+TEST_CASE(test_cumulative_operations) {
+    ndarray<int> values({5}, {1, 2, 3, 4, 5});
+    auto sums = cumsum(values);
+    auto prods = cumprod(values);
+
+    assert((sums[0] == 1 && sums[1] == 3 && sums[2] == 6 && sums[3] == 10 && sums[4] == 15));
+    assert((prods[0] == 1 && prods[1] == 2 && prods[2] == 6 && prods[3] == 24 && prods[4] == 120));
+}
+
 int main() {
     RUN_TEST(test_addition);
     RUN_TEST(test_scalar_addition);
     RUN_TEST(test_multiplication);
     RUN_TEST(test_sum_reduction);
     RUN_TEST(test_mean_reduction);
+    RUN_TEST(test_where_broadcasting);
+    RUN_TEST(test_clip_scalar);
+    RUN_TEST(test_clip_broadcast);
+    RUN_TEST(test_argmax_argmin);
+    RUN_TEST(test_logical_operations);
+    RUN_TEST(test_all_any);
+    RUN_TEST(test_cumulative_operations);
 
     std::cout << "All tests passed!\n";
     return 0;
