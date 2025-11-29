@@ -6,4 +6,3 @@
 namespace numbits {
     // Non-template implementation can go here if needed
 }
-

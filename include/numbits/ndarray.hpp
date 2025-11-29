@@ -290,4 +290,3 @@ using ndarrayu64 = ndarray<uint64_t>;
 
 
 } // namespace numbits
-

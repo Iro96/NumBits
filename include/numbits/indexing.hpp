@@ -134,5 +134,3 @@ ndarray<T> slice_1d(const ndarray<T>& arr, size_t start, size_t stop, size_t ste
 }
 
 } // namespace numbits
-
-

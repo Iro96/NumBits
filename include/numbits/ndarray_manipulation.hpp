@@ -231,4 +231,3 @@ ndarray<T> tile(const ndarray<T>& arr, const std::vector<size_t>& reps) {
 }
 
 } // namespace numbits
-

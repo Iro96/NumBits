@@ -153,4 +153,3 @@ ndarray<T> round(const ndarray<T>& arr) {
 }
 
 } // namespace numbits
-

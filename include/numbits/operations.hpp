@@ -426,4 +426,3 @@ size_t argmin(const ndarray<T>& arr) {
 }
 
 } // namespace numbits
-

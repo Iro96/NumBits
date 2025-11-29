@@ -197,5 +197,3 @@ T trace(const ndarray<T>& arr) {
 }
 
 } // namespace numbits
-
-

@@ -17,4 +17,3 @@
 
 // Convenience namespace
 namespace nb = numbits;
-

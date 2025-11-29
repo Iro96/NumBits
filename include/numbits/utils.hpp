@@ -81,4 +81,3 @@ inline std::string shape_to_string(const Shape& shape) {
 }
 
 } // namespace numbits
-

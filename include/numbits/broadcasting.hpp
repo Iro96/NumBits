@@ -81,4 +81,3 @@ ndarray<T> broadcast_to(const ndarray<T>& arr, const Shape& target_shape) {
 }
 
 } // namespace numbits
-

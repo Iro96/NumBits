@@ -82,4 +82,3 @@ cmake .. -DNUMBITS_BUILD_TESTS=ON
 cmake --build .
 ctest
 ```
-
