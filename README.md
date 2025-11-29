@@ -114,7 +114,7 @@ cmake --install .
 ### How to compile
 
 ```bash
-g++ /path/to/file.cpp -I../include -std=c++17 -o /path/to/output/file.exe
+g++ /path/to/file.cpp -I path/to/numbits/include -std=c++17 -o /path/to/output/file.exe
 ```
 Then
 ```bash
@@ -336,4 +336,5 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 - Better broadcasting performance
 - SIMD optimizations
 - Sparse array support
+
 
