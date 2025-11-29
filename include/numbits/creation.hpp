@@ -84,4 +84,93 @@ ndarray<T> eye(size_t n, size_t m = 0, int k = 0) {
     return result;
 }
 
+// Diagonal matrix creation
+template<typename T>
+ndarray<T> diag(const ndarray<T>& arr, int k = 0) {
+    const auto& shape = arr.shape();
+
+    // 1D array -> create diagonal matrix
+    if (shape.size() == 1) {
+        size_t n = shape[0];
+        size_t rows = n + (k > 0 ? k : 0);
+        size_t cols = n + (k < 0 ? -k : 0);
+
+        ndarray<T> result({rows, cols});
+        result.fill(T{0});
+
+        for (size_t i = 0; i < n; ++i) {
+            int r = static_cast<int>(i) + (k > 0 ? k : 0);
+            int c = static_cast<int>(i) + (k < 0 ? -k : 0);
+            if (r >= 0 && c >= 0 && static_cast<size_t>(r) < rows && static_cast<size_t>(c) < cols) {
+                result[r * cols + c] = arr[i];
+            }
+        }
+        return result;
+    }
+
+    else if (shape.size() == 2) {
+        // 2D array -> extract diagonal
+        size_t rows = shape[0];
+        size_t cols = shape[1];
+        
+        // Determine diagonal start
+        int start_row = k < 0 ? -k : 0;
+        int start_col = k > 0 ? k : 0;
+
+        // Determine diagonal length
+        size_t len = 0;
+        if (start_row < rows && start_col < cols) {
+            len = std::min(rows - start_row, cols - start_col);
+        }
+
+        ndarray<T> result({len});
+        for (size_t i = 0; i < len; ++i) {
+            result[i] = arr[(start_row + i) * cols + (start_col + i)];
+        }
+        return result;
+    }
+
+    throw std::runtime_error("diag: input must be 1D or 2D ndarray");
+}
+
+// Vander
+template<typename T>
+ndarray<T> vander(const ndarray<T>& x, size_t N, bool increasing = false) {
+    const auto& shape = x.shape();
+
+    if (shape.size() != 1) {
+        throw std::runtime_error("vander: input must be a 1D ndarray");
+    }
+
+    size_t M = shape[0];               // number of samples
+    ndarray<T> result({M, N});
+    result.fill(T{0});
+
+    for (size_t i = 0; i < M; ++i) {
+        T base = x[i];
+
+        for (size_t j = 0; j < N; ++j) {
+            size_t power;
+
+            if (!increasing) {
+                // default behavior: highest power first
+                power = N - 1 - j;
+            } else {
+                // increasing=True: lowest power first
+                power = j;
+            }
+
+            // compute base^power
+            T val = T{1};
+            for (size_t p = 0; p < power; ++p) {
+                val *= base;
+            }
+
+            result[i * N + j] = val;
+        }
+    }
+
+    return result;
+}
+
 } // namespace numbits
