@@ -111,6 +111,16 @@ cmake --install .
 
 ## Usage
 
+### How to compile
+
+```bash
+g++ /path/to/file.cpp -I../include -std=c++17 -o /path/to/output/file.exe
+```
+Then
+```bash
+/path/to/output/file.exe
+```
+
 ### 1. Basic Example
 
 ```cpp
@@ -300,44 +310,6 @@ template<typename T> Array<T> pow(const Array<T>& arr, T exponent);
 
 ---
 
-## Project Structure
-
-```bash
-NumBits/
-├── CMakeLists.txt          # Main CMake configuration
-├── README.md               # This file
-├── include/
-│   └── numbits/
-│       ├── array.hpp           # Core Array class
-│       ├── types.hpp           # Type definitions
-│       ├── utils.hpp           # Utility functions
-│       ├── operations.hpp      # Element-wise operations
-│       ├── broadcasting.hpp    # Broadcasting functionality
-│       ├── math_functions.hpp  # Mathematical functions
-│       ├── linear_algebra.hpp  # Linear algebra operations
-│       ├── array_manipulation.hpp # Array manipulation
-│       └── indexing.hpp        # Indexing and slicing
-├── src/
-│   ├── array.cpp
-│   ├── operations.cpp
-│   ├── math_functions.cpp
-│   ├── linear_algebra.cpp
-│   ├── broadcasting.cpp
-│   ├── array_manipulation.cpp
-│   └── indexing.cpp
-├── examples/
-│   ├── CMakeLists.txt
-│   ├── example_basic.cpp
-│   ├── example_linear_algebra.cpp
-│   ├── example_math.cpp
-│   └── example_broadcasting.cpp
-└── tests/
-    ├── CMakeLists.txt
-    ├── test_array.cpp
-    ├── test_operations.cpp
-    └── test_linear_algebra.cpp
-```
-
 ## Performance
 
 NumBits is designed for performance:
@@ -364,3 +336,4 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 - Better broadcasting performance
 - SIMD optimizations
 - Sparse array support
+
