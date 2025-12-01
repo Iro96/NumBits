@@ -52,7 +52,7 @@ ndarray<T> remainder(const ndarray<T>& a, const ndarray<T>& b) {
  * @brief Element-wise clipping of array values to [min_val, max_val].
  */
 template<typename T>
-ndarray<T> clip(const ndarray<T>& arr, T min_val, T max_val) {
+ndarray<T> mclip(const ndarray<T>& arr, T min_val, T max_val) {
     ndarray<T> result(arr.shape());
     std::transform(arr.begin(), arr.end(), result.begin(),
                    [min_val, max_val](T val) -> T {
