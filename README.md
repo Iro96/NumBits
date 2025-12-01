@@ -142,22 +142,22 @@ Then
 ### 1. Basic Example
 
 ```cpp
-#include "numbits/array.hpp"
+#include "numbits/ndarray.hpp"
 #include "numbits/operations.hpp"
 
 using namespace numbits;
 
 // Create arrays
-Array<float> a({2, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
-Array<float> b({2, 3}, {7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f});
+ndarray<float> a({2, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
+ndarray<float> b({2, 3}, {7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f});
 
 // Element-wise operations
 auto c = a + b;
 auto d = a * 2.0f;
 
 // Create special arrays
-auto zeros = Array<float>::zeros({3, 4});
-auto ones = Array<float>::ones({2, 2});
+auto zeros = ndarray<float>::zeros({3, 4});
+auto ones = ndarray<float>::ones({2, 2});
 
 // Reshape
 auto flattened = a.flatten();
@@ -167,21 +167,21 @@ auto reshaped = flattened.reshape({3, 2});
 ### 2. Linear Algebra Example
 
 ```cpp
-#include "numbits/array.hpp"
+#include "numbits/ndarray.hpp"
 #include "numbits/linear_algebra.hpp"
 
 using namespace numbits;
 
 // Matrix multiplication
-Array<float> A({2, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
-Array<float> B({3, 2}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
+ndarray<float> A({2, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
+ndarray<float> B({3, 2}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
 auto C = matmul(A, B);
 
 // Transpose
 auto At = transpose(A);
 
 // Determinant and inverse
-Array<float> matrix({2, 2}, {4.0f, 7.0f, 2.0f, 6.0f});
+ndarray<float> matrix({2, 2}, {4.0f, 7.0f, 2.0f, 6.0f});
 float det = determinant(matrix);
 auto inv = inverse(matrix);
 ```
@@ -189,12 +189,12 @@ auto inv = inverse(matrix);
 ### 3. Mathematical Functions Example
 
 ```cpp
-#include "numbits/array.hpp"
+#include "numbits/ndarray.hpp"
 #include "numbits/math_functions.hpp"
 
 using namespace numbits;
 
-Array<float> arr({2, 2}, {0.0f, M_PI/4.0f, M_PI/2.0f, M_PI});
+ndarray<float> arr({2, 2}, {0.0f, M_PI/4.0f, M_PI/2.0f, M_PI});
 
 // Trigonometric functions
 auto sin_arr = sin(arr);
@@ -212,14 +212,14 @@ auto pow_arr = pow(arr, 2.0f);
 ### 4. Broadcasting Example
 
 ```cpp
-#include "numbits/array.hpp"
+#include "numbits/ndarray.hpp"
 #include "numbits/operations.hpp"
 
 using namespace numbits;
 
 // Broadcasting
-Array<float> a({2, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
-Array<float> b({3}, {10.0f, 20.0f, 30.0f});
+ndarray<float> a({2, 3}, {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f});
+ndarray<float> b({3}, {10.0f, 20.0f, 30.0f});
 
 // Automatic broadcasting
 auto c = a + b;  // b is broadcasted to match a's shape
@@ -248,10 +248,18 @@ auto partial_sums = cumsum(blended);
 
 ```cpp
 template<typename T>
-class Array {
+class ndarray {
     // Constructors
-    Array(const Shape& shape);
-    Array(const Shape& shape, const std::vector<T>& data);
+    ndarray(const Shape& shape);
+    ndarray(const Shape& shape, const std::vector<T>& data);
+    ndarray(const Shape& shape, std::initializer_list<T> data);
+    ndarray(std::initializer_list<T> data);  // 1D constructor
+    
+    // Copy and move semantics
+    ndarray(const ndarray& other);
+    ndarray(ndarray&& other) noexcept;
+    ndarray& operator=(const ndarray& other);
+    ndarray& operator=(ndarray&& other) noexcept;
     
     // Accessors
     const Shape& shape() const;
@@ -267,14 +275,22 @@ class Array {
     T& at(const std::vector<size_t>& indices);
     const T& at(const std::vector<size_t>& indices) const;
     
+    // Iterators
+    iterator begin();
+    iterator end();
+    const_iterator begin() const;
+    const_iterator end() const;
+    
     // Static factory methods
-    static Array zeros(const Shape& shape);
-    static Array ones(const Shape& shape);
-    static Array full(const Shape& shape, const T& value);
+    static ndarray zeros(const Shape& shape);
+    static ndarray ones(const Shape& shape);
+    static ndarray full(const Shape& shape, const T& value);
     
     // Manipulation
-    Array reshape(const Shape& new_shape) const;
-    Array flatten() const;
+    ndarray reshape(const Shape& new_shape) const;
+    ndarray flatten() const;
+    void fill(const T& value);
+    void print(std::ostream& os = std::cout) const;
 };
 ```
 
@@ -282,64 +298,105 @@ class Array {
 
 ```cpp
 // Element-wise operations
-template<typename T> Array<T> add(const Array<T>& a, const Array<T>& b);
-template<typename T> Array<T> subtract(const Array<T>& a, const Array<T>& b);
-template<typename T> Array<T> multiply(const Array<T>& a, const Array<T>& b);
-template<typename T> Array<T> divide(const Array<T>& a, const Array<T>& b);
+template<typename T> ndarray<T> operator+(const ndarray<T>& a, const ndarray<T>& b);
+template<typename T> ndarray<T> operator-(const ndarray<T>& a, const ndarray<T>& b);
+template<typename T> ndarray<T> operator*(const ndarray<T>& a, const ndarray<T>& b);
+template<typename T> ndarray<T> operator/(const ndarray<T>& a, const ndarray<T>& b);
 
 // Scalar operations
-template<typename T> Array<T> add_scalar(const Array<T>& a, T scalar);
-template<typename T> Array<T> multiply_scalar(const Array<T>& a, T scalar);
+template<typename T> ndarray<T> operator+(const ndarray<T>& a, T scalar);
+template<typename T> ndarray<T> operator-(const ndarray<T>& a, T scalar);
+template<typename T> ndarray<T> operator*(const ndarray<T>& a, T scalar);
+template<typename T> ndarray<T> operator/(const ndarray<T>& a, T scalar);
 
 // Reduction operations
-template<typename T> T sum(const Array<T>& arr);
-template<typename T> T mean(const Array<T>& arr);
-template<typename T> T min(const Array<T>& arr);
-template<typename T> T max(const Array<T>& arr);
+template<typename T> T sum(const ndarray<T>& arr);
+template<typename T> T mean(const ndarray<T>& arr);
+template<typename T> T min(const ndarray<T>& arr);
+template<typename T> T max(const ndarray<T>& arr);
 
-// Operator overloads
-template<typename T> Array<T> operator+(const Array<T>& a, const Array<T>& b);
-template<typename T> Array<T> operator*(const Array<T>& a, T scalar);
-// ... and more
+// Extrema and indexing
+template<typename T> size_t argmax(const ndarray<T>& arr);
+template<typename T> size_t argmin(const ndarray<T>& arr);
+
+// Advanced operations
+template<typename T> ndarray<T> clip(const ndarray<T>& arr, T min_val, T max_val);
+template<typename T> ndarray<T> where(const ndarray<bool>& condition, 
+                                      const ndarray<T>& x, 
+                                      const ndarray<T>& y);
+
+// Logical operations
+template<typename T> ndarray<bool> logical_and(const ndarray<T>& a, const ndarray<T>& b);
+template<typename T> ndarray<bool> logical_or(const ndarray<T>& a, const ndarray<T>& b);
+template<typename T> ndarray<bool> logical_xor(const ndarray<T>& a, const ndarray<T>& b);
+template<typename T> ndarray<bool> logical_not(const ndarray<T>& a);
+template<typename T> bool all(const ndarray<T>& arr);
+template<typename T> bool any(const ndarray<T>& arr);
+
+// Cumulative operations
+template<typename T> ndarray<T> cumsum(const ndarray<T>& arr);
+template<typename T> ndarray<T> cumprod(const ndarray<T>& arr);
 ```
 
 ### 3. Linear Algebra
 
 ```cpp
-template<typename T> Array<T> matmul(const Array<T>& a, const Array<T>& b);
-template<typename T> Array<T> dot(const Array<T>& a, const Array<T>& b);
-template<typename T> Array<T> transpose(const Array<T>& arr);
-template<typename T> T determinant(const Array<T>& arr);
-template<typename T> Array<T> inverse(const Array<T>& arr);
-template<typename T> T trace(const Array<T>& arr);
+template<typename T> ndarray<T> matmul(const ndarray<T>& a, const ndarray<T>& b);
+template<typename T> ndarray<T> dot(const ndarray<T>& a, const ndarray<T>& b);
+template<typename T> ndarray<T> transpose(const ndarray<T>& arr);
+template<typename T> T determinant(const ndarray<T>& arr);
+template<typename T> ndarray<T> inverse(const ndarray<T>& arr);
+template<typename T> T trace(const ndarray<T>& arr);
 ```
 
 ### 4. Math Functions
 
 ```cpp
-template<typename T> Array<T> sin(const Array<T>& arr);
-template<typename T> Array<T> cos(const Array<T>& arr);
-template<typename T> Array<T> exp(const Array<T>& arr);
-template<typename T> Array<T> log(const Array<T>& arr);
-template<typename T> Array<T> sqrt(const Array<T>& arr);
-template<typename T> Array<T> pow(const Array<T>& arr, T exponent);
-// ... and more
+template<typename T> ndarray<T> sin(const ndarray<T>& arr);
+template<typename T> ndarray<T> cos(const ndarray<T>& arr);
+template<typename T> ndarray<T> tan(const ndarray<T>& arr);
+template<typename T> ndarray<T> asin(const ndarray<T>& arr);
+template<typename T> ndarray<T> acos(const ndarray<T>& arr);
+template<typename T> ndarray<T> atan(const ndarray<T>& arr);
+template<typename T> ndarray<T> sinh(const ndarray<T>& arr);
+template<typename T> ndarray<T> cosh(const ndarray<T>& arr);
+template<typename T> ndarray<T> tanh(const ndarray<T>& arr);
+template<typename T> ndarray<T> exp(const ndarray<T>& arr);
+template<typename T> ndarray<T> log(const ndarray<T>& arr);
+template<typename T> ndarray<T> log10(const ndarray<T>& arr);
+template<typename T> ndarray<T> sqrt(const ndarray<T>& arr);
+template<typename T> ndarray<T> pow(const ndarray<T>& arr, T exponent);
+template<typename T> ndarray<T> abs(const ndarray<T>& arr);
+template<typename T> ndarray<T> ceil(const ndarray<T>& arr);
+template<typename T> ndarray<T> floor(const ndarray<T>& arr);
+template<typename T> ndarray<T> round(const ndarray<T>& arr);
 ```
 
-### 5. Input/Output
+### 5. Array Creation Functions
+
+```cpp
+// Range and linear spacing
+template<typename T> ndarray<T> arange(T start, T stop, T step = 1);
+template<typename T> ndarray<T> arange(T stop);
+template<typename T> ndarray<T> linspace(T start, T stop, size_t num, bool endpoint = true);
+
+// Identity and diagonal arrays
+template<typename T> ndarray<T> eye(size_t n, size_t m = 0, int k = 0);
+```
+
+### 6. Input/Output
 
 ```cpp
 // --- File extension helper ---
 inline std::string ensure_cb_extension(const std::string& filename);
 
 // --- Raw file I/O ---
-template<typename T> void tofile(const Array<T>& arr, const std::string& filename, const std::string& sep = "");
-template<typename T> Array<T> fromfile(const std::string& filename, const std::string& sep = "");
+template<typename T> void tofile(const ndarray<T>& arr, const std::string& filename, const std::string& sep = "");
+template<typename T> ndarray<T> fromfile(const std::string& filename, const std::string& sep = "");
 
 // --- Structured binary I/O ---
-template<typename T> void dump(const Array<T>& arr, const std::string& filename);
-template<typename T> Array<T> load(const std::string& filename);
-
+template<typename T> void dump(const ndarray<T>& arr, const std::string& filename);
+template<typename T> ndarray<T> load(const std::string& filename);
 ```
 
 ---

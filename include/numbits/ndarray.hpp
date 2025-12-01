@@ -1,3 +1,34 @@
+/**
+ * @file ndarray.hpp
+ * @brief Core n-dimensional array class for NumBits.
+ *
+ * Defines the ndarray class template - the fundamental container for all NumBits operations.
+ *
+ * Features:
+ *   - N-dimensional array support with configurable shape
+ *   - Flexible data types (float, double, int32, int64, uint8, bool, etc.)
+ *   - Efficient memory management with move semantics
+ *   - Copy-on-write semantics where applicable
+ *   - Row-major (C-style) memory layout with stride support
+ *   - Element access via flat indexing or multi-dimensional indexing
+ *   - Factory methods (zeros, ones, full)
+ *   - Shape manipulation (reshape, flatten)
+ *   - Iterator support for STL algorithms
+ *   - Pretty printing for visualization
+ *
+ * @tparam T Data type of array elements (e.g., float, double, int)
+ *
+ * @example
+ * @code
+ *   ndarray<float> arr({2, 3}, {1, 2, 3, 4, 5, 6});
+ *   auto zeros = ndarray<float>::zeros({3, 4});
+ *   auto reshaped = arr.reshape({3, 2});
+ *   arr.print();  // Pretty print
+ * @endcode
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "types.hpp"
@@ -14,6 +45,15 @@
 
 namespace numbits {
 
+/**
+ * @class ndarray
+ * @brief N-dimensional array container for numerical computations.
+ *
+ * Provides a NumPy-like interface for managing and manipulating multi-dimensional arrays.
+ * Supports flexible dtypes and efficient memory management.
+ *
+ * @tparam T Underlying data type
+ */
 template<typename T>
 class ndarray {
 public:

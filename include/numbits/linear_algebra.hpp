@@ -1,3 +1,17 @@
+/**
+ * @file linear_algebra.hpp
+ * @brief Linear algebra operations for matrices and vectors.
+ *
+ * This header provides:
+ *   - Matrix multiplication (matmul, dot product)
+ *   - Matrix transpose
+ *   - Determinant calculation (2x2 and 3x3)
+ *   - Matrix inverse
+ *   - Matrix trace (sum of diagonal elements)
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "ndarray.hpp"

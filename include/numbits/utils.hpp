@@ -1,3 +1,16 @@
+/**
+ * @file utils.hpp
+ * @brief Utility functions for array shape, stride, and index calculations.
+ *
+ * Provides helper functions:
+ *   - compute_size: Calculate total elements from shape
+ *   - compute_strides: Calculate memory strides from shape
+ *   - flatten_index: Convert multi-dimensional indices to flat index
+ *   - shape_to_string: Format shape for display
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "types.hpp"

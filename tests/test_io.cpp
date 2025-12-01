@@ -1,3 +1,17 @@
+/**
+ * @file test_io.cpp
+ * @brief Unit tests for file I/O operations (dump, load, tofile, fromfile).
+ *
+ * Tests the following:
+ *   - Binary structured I/O (dump/load with .cb extension)
+ *   - Text I/O with various separators (tofile/fromfile)
+ *   - Binary I/O without separators
+ *   - Type mismatch error handling
+ *   - Whitespace flexibility in text parsing
+ *
+ * @date 2025
+ */
+
 #include <iostream>
 #include <cassert>
 #include <algorithm>
@@ -13,11 +27,17 @@ using namespace numbits;
     name(); \
     std::cout << "OK\n";
 
-// Utility: remove file if exists
+/**
+ * @brief Utility function to remove a file if it exists.
+ * @param f The filename to remove
+ */
 static void remove_file(const std::string& f) {
     std::remove(f.c_str());
 }
 
+/**
+ * @brief Test structured binary dump and load operations.
+ */
 //   TEST dump / load (structured binary)
 TEST_CASE(test_dump_load_structured) {
     ndarray<float> original({2,3}, {1,2,3,4,5,6});
@@ -34,6 +54,9 @@ TEST_CASE(test_dump_load_structured) {
     remove_file("test_struct.cb");
 }
 
+/**
+ * @brief Test text file I/O with newline separator.
+ */
 //   TEST tofile (text) + fromfile (text)
 TEST_CASE(test_text_tofile_fromfile) {
     ndarray<double> arr({5}, {1.5, 2.5, -3.25, 4.0, 10.75});
@@ -49,6 +72,9 @@ TEST_CASE(test_text_tofile_fromfile) {
     remove_file("test_text.txt");
 }
 
+/**
+ * @brief Test binary file I/O with empty separator.
+ */
 //   TEST tofile (binary) + fromfile (binary)
 TEST_CASE(test_binary_tofile_fromfile) {
     ndarray<int> arr({4}, {10, 20, 30, 40});
@@ -66,6 +92,9 @@ TEST_CASE(test_binary_tofile_fromfile) {
     remove_file("test_bin.raw");
 }
 
+/**
+ * @brief Test text I/O with custom separators (comma-delimited).
+ */
 //   TEST arbitrary separator text I/O
 TEST_CASE(test_text_sep_comma) {
     ndarray<float> arr({4}, {1.0f, 2.0f, 3.5f, 10.25f});
@@ -81,6 +110,9 @@ TEST_CASE(test_text_sep_comma) {
     remove_file("test_comma.txt");
 }
 
+/**
+ * @brief Test that loading with wrong type throws an error.
+ */
 //   TEST load() type mismatch throws
 TEST_CASE(test_type_mismatch) {
     ndarray<double> arr({2}, {1.0, 2.0});
@@ -98,6 +130,9 @@ TEST_CASE(test_type_mismatch) {
     remove_file("type_mismatch.cb");
 }
 
+/**
+ * @brief Test text reading with mixed whitespace in separators.
+ */
 //   TEST fromfile text reading mixed whitespace
 TEST_CASE(test_text_whitespace_flexibility) {
     // Create mixed whitespace manually
@@ -118,6 +153,38 @@ TEST_CASE(test_text_whitespace_flexibility) {
     remove_file("ws.txt");
 }
 
+/**
+ * @brief Test loading arrays of different types from binary files.
+ */
+TEST_CASE(test_load_multiple_types) {
+    // Test with double
+    ndarray<double> arr_double({3}, {1.5, 2.5, 3.5});
+    dump(arr_double, "test_double.cb");
+    auto loaded = load<double>("test_double.cb");
+    assert(loaded.size() == 3);
+    assert(std::abs(loaded[0] - 1.5) < 1e-9);
+    remove_file("test_double.cb");
+
+    // Test with int
+    ndarray<int> arr_int({4}, {10, 20, 30, 40});
+    dump(arr_int, "test_int.cb");
+    auto loaded_int = load<int>("test_int.cb");
+    assert(loaded_int.size() == 4);
+    assert(loaded_int[0] == 10);
+    remove_file("test_int.cb");
+}
+
+/**
+ * @brief Test preserving shape through dump and load operations.
+ */
+TEST_CASE(test_io_preserves_shape) {
+    ndarray<float> arr({2, 3, 4}, std::vector<float>(24, 1.5f));
+    dump(arr, "test_shape.cb");
+    auto loaded = load<float>("test_shape.cb");
+    assert((loaded.shape() == Shape{2, 3, 4}));
+    remove_file("test_shape.cb");
+}
+
 //   Main
 int main() {
     std::cout << "=== NumBits IO Tests ===\n\n";
@@ -128,6 +195,8 @@ int main() {
     RUN_TEST(test_text_sep_comma);
     RUN_TEST(test_type_mismatch);
     RUN_TEST(test_text_whitespace_flexibility);
+    RUN_TEST(test_load_multiple_types);
+    RUN_TEST(test_io_preserves_shape);
 
     std::cout << "\nAll tests passed!\n";
     return 0;

@@ -1,3 +1,16 @@
+/**
+ * @file indexing.hpp
+ * @brief Advanced indexing and slicing operations.
+ *
+ * Provides:
+ *   - Slice specification for range-based indexing
+ *   - take: Extract elements at specified indices along axis
+ *   - Boolean indexing support
+ *   - Slicing operations with start, stop, step
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "ndarray.hpp"

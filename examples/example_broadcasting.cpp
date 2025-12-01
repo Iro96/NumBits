@@ -1,3 +1,18 @@
+/**
+ * @file example_broadcasting.cpp
+ * @brief Examples demonstrating NumPy-style broadcasting in NumBits.
+ *
+ * Broadcasting enables operations between arrays of different shapes by
+ * automatically expanding dimensions. This example demonstrates:
+ *   - Broadcasting in basic arithmetic operations
+ *   - Scalar broadcasting
+ *   - Row and column vector broadcasting
+ *   - Matrix-vector broadcasting
+ *   - How dimensions are aligned and expanded
+ *
+ * @date 2025
+ */
+
 #include <iostream>
 #include "numbits/ndarray.hpp"
 #include "numbits/operations.hpp"
@@ -5,6 +20,10 @@
 
 using namespace numbits;
 
+/**
+ * @brief Main function demonstrating broadcasting operations.
+ * @return 0 on successful execution
+ */
 int main() {
     std::cout << "=== NumBits Broadcasting Example ===\n\n";
     

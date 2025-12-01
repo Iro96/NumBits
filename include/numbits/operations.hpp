@@ -1,3 +1,21 @@
+/**
+ * @file operations.hpp
+ * @brief Element-wise operations, reductions, and advanced array operations.
+ *
+ * This header provides:
+ *   - Element-wise arithmetic operations (add, subtract, multiply, divide)
+ *   - Scalar operations (adding/multiplying scalars)
+ *   - Reduction operations (sum, mean, min, max)
+ *   - Comparison operations (equal, not_equal, less, greater, etc.)
+ *   - Advanced operations (where, clip, argmax, argmin)
+ *   - Logical operations (logical_and, logical_or, logical_xor, logical_not)
+ *   - Boolean reductions (all, any)
+ *   - Cumulative operations (cumsum, cumprod)
+ *   - Operator overloads for intuitive syntax
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "ndarray.hpp"
@@ -10,7 +28,13 @@
 
 namespace numbits {
 
-// Element-wise operations
+/**
+ * @brief Element-wise addition of two arrays with automatic broadcasting.
+ * @tparam T Data type of array elements
+ * @param a First ndarray
+ * @param b Second ndarray
+ * @return ndarray containing element-wise sum of a and b
+ */
 template<typename T>
 ndarray<T> add(const ndarray<T>& a, const ndarray<T>& b) {
     Shape result_shape = broadcast_shapes(a.shape(), b.shape());

@@ -1,3 +1,15 @@
+/**
+ * @file types.hpp
+ * @brief Type definitions and utilities for NumBits arrays.
+ *
+ * Defines:
+ *   - Shape and Strides types
+ *   - DType enumeration for type information
+ *   - Type-to-dtype mapping utilities
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include <vector>

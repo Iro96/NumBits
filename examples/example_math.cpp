@@ -1,3 +1,17 @@
+/**
+ * @file example_math.cpp
+ * @brief Mathematical functions available in NumBits.
+ *
+ * This example demonstrates:
+ *   - Trigonometric functions (sin, cos, etc.)
+ *   - Exponential and logarithmic functions (exp, log)
+ *   - Power and root functions (pow, sqrt)
+ *   - Rounding functions (floor, ceil, round)
+ *   - Element-wise function application to arrays
+ *
+ * @date 2025
+ */
+
 #define _USE_MATH_DEFINES
 #include <iostream>
 #include <cmath>
@@ -6,6 +20,10 @@
 
 using namespace numbits;
 
+/**
+ * @brief Main function demonstrating mathematical functions.
+ * @return 0 on successful execution
+ */
 int main() {
     std::cout << "=== NumBits Math Functions Example ===\n\n";
     

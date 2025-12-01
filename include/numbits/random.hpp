@@ -1,3 +1,17 @@
+/**
+ * @file random.hpp
+ * @brief Random number generation functions for arrays.
+ *
+ * Provides functions to generate arrays with random values:
+ *   - rand: Uniform random values [0, 1)
+ *   - randn: Standard normal distribution N(0, 1)
+ *   - randint: Random integers in range
+ *   - Default engines for reproducibility
+ *   - Optional OpenMP parallel support
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "ndarray.hpp"

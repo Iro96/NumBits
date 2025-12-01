@@ -1,3 +1,17 @@
+/**
+ * @file ndarray_manipulation.hpp
+ * @brief Array manipulation operations (concatenate, stack, split, tile, reshape_advanced).
+ *
+ * Provides functions to manipulate array structure:
+ *   - concatenate: Join arrays along existing axis
+ *   - stack: Join arrays along new axis
+ *   - split: Divide array into subarrays
+ *   - tile: Repeat array elements
+ *   - hstack, vstack, dstack: Convenience stacking functions
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "ndarray.hpp"

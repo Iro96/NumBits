@@ -1,3 +1,17 @@
+/**
+ * @file math_functions.hpp
+ * @brief Element-wise mathematical functions for arrays.
+ *
+ * This header provides:
+ *   - Trigonometric functions (sin, cos, tan, asin, acos, atan, sinh, cosh, tanh)
+ *   - Exponential and logarithmic functions (exp, log, log10)
+ *   - Power and root functions (pow, sqrt, cbrt)
+ *   - Rounding functions (ceil, floor, round)
+ *   - Sign and absolute value functions
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "ndarray.hpp"

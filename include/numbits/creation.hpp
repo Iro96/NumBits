@@ -1,3 +1,15 @@
+/**
+ * @file creation.hpp
+ * @brief Array creation functions (arange, linspace, eye).
+ *
+ * Provides utility functions for creating arrays with specific patterns:
+ *   - arange: Create evenly spaced values within interval
+ *   - linspace: Create fixed-length linearly spaced arrays
+ *   - eye: Create identity or unit matrices
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "ndarray.hpp"

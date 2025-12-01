@@ -1,9 +1,28 @@
+/**
+ * @file example_linear_algebra.cpp
+ * @brief Linear algebra operations using NumBits.
+ *
+ * This example demonstrates:
+ *   - Matrix multiplication using matmul
+ *   - Transpose operations
+ *   - Computing determinants
+ *   - Computing matrix inverses
+ *   - Verifying mathematical properties (e.g., A * A^(-1) = I)
+ *   - Computing matrix trace
+ *
+ * @date 2025
+ */
+
 #include <iostream>
 #include "numbits/ndarray.hpp"
 #include "numbits/linear_algebra.hpp"
 
 using namespace numbits;
 
+/**
+ * @brief Main function demonstrating linear algebra operations.
+ * @return 0 on successful execution
+ */
 int main() {
     std::cout << "=== NumBits Linear Algebra Example ===\n\n";
     

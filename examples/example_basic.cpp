@@ -1,9 +1,28 @@
+/**
+ * @file example_basic.cpp
+ * @brief Basic examples demonstrating fundamental NumBits operations.
+ *
+ * This example demonstrates:
+ *   - Creating and initializing n-dimensional arrays
+ *   - Performing element-wise operations (addition, multiplication)
+ *   - Scalar operations (adding/multiplying by scalars)
+ *   - Creating special arrays (zeros, ones)
+ *   - Array reshaping and flattening
+ *   - Reduction operations (sum, mean, min, max)
+ *
+ * @date 2025
+ */
+
 #include <iostream>
 #include "numbits/ndarray.hpp"
 #include "numbits/operations.hpp"
 
 using namespace numbits;
 
+/**
+ * @brief Main function demonstrating basic NumBits operations.
+ * @return 0 on successful execution
+ */
 int main() {
     std::cout << "=== NumBits Basic Example ===\n\n";
     

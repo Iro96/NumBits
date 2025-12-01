@@ -1,3 +1,15 @@
+/**
+ * @file io.hpp
+ * @brief File I/O operations for saving and loading arrays.
+ *
+ * Provides multiple I/O formats:
+ *   - Binary structured I/O (dump/load): Stores shape, type, and data
+ *   - Text I/O (tofile/fromfile): Human-readable text with custom separators
+ *   - Raw binary I/O: Stores only data without metadata
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "ndarray.hpp"

@@ -1,3 +1,16 @@
+/**
+ * @file broadcasting.hpp
+ * @brief Broadcasting utilities for NumPy-like array dimension expansion.
+ *
+ * Provides functionality to broadcast arrays to compatible shapes for
+ * element-wise operations. Follows NumPy broadcasting rules:
+ *   - Arrays are aligned from the right
+ *   - Dimensions with size 1 can be stretched to match
+ *   - Missing dimensions are treated as size 1
+ *
+ * @namespace numbits
+ */
+
 #pragma once
 
 #include "ndarray.hpp"
