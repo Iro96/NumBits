@@ -1,6 +1,22 @@
 # NumBits
 
+[![CMake on multiple platforms](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/Iro96/NumBits/actions/workflows/cmake-multi-platform.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+![PR: Welcome](https://img.shields.io/badge/PR-Welcome-orange.svg)
+![Version: n/a](https://img.shields.io/badge/Version-n/a-red.svg)
+![Author: Iro96 - ndhquan](https://img.shields.io/badge/Author-Iro96-yellow.svg)
+
 A comprehensive NumPy-like library written entirely in C++17. NumBits provides multidimensional arrays, mathematical operations, linear algebra, broadcasting, and more - all implemented purely in C++.
+
+---
+
+## Contributors
+
+<a href="https://github.com/Iro96/Numbits/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Iro96/Numbits" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
 ---
 
