@@ -116,7 +116,9 @@ cmake --install .
 ```bash
 g++ /path/to/file.cpp -I path/to/numbits/include -std=c++17 -o /path/to/output/file.exe
 ```
+
 Then
+
 ```bash
 /path/to/output/file.exe
 ```
@@ -308,6 +310,22 @@ template<typename T> Array<T> pow(const Array<T>& arr, T exponent);
 // ... and more
 ```
 
+### 5. Input/Output
+
+```cpp
+// --- File extension helper ---
+inline std::string ensure_cb_extension(const std::string& filename);
+
+// --- Raw file I/O ---
+template<typename T> void tofile(const Array<T>& arr, const std::string& filename, const std::string& sep = "");
+template<typename T> Array<T> fromfile(const std::string& filename, const std::string& sep = "");
+
+// --- Structured binary I/O ---
+template<typename T> void dump(const Array<T>& arr, const std::string& filename);
+template<typename T> Array<T> load(const std::string& filename);
+
+```
+
 ---
 
 ## Performance
@@ -336,5 +354,3 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 - Better broadcasting performance
 - SIMD optimizations
 - Sparse array support
-
-
