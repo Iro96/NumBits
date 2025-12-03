@@ -21,7 +21,25 @@
 
 namespace numbits {
 
-// Concatenate ndarrays along an axis
+/**
+ * @brief Concatenate multiple ndarrays along an existing axis.
+ *
+ * Works similarly to NumPy's `np.concatenate`. All arrays must:
+ *   - Have the same number of dimensions
+ *   - Match in all dimensions except the specified axis
+ *
+ * @tparam T Element data type
+ * @param ndarrays Vector of ndarrays to concatenate
+ * @param axis Axis along which concatenation occurs (0-based)
+ *
+ * @return ndarray<T> A new array containing the concatenated result
+ *
+ * @throws std::runtime_error If:
+ *   - Input list is empty
+ *   - Arrays have mismatched ranks
+ *   - Dimensions (other than axis) do not match
+ *   - Axis is out of range
+ */
 template<typename T>
 ndarray<T> concatenate(const std::vector<ndarray<T>>& ndarrays, size_t axis = 0) {
     if (ndarrays.empty()) {
@@ -86,7 +104,26 @@ ndarray<T> concatenate(const std::vector<ndarray<T>>& ndarrays, size_t axis = 0)
     return result;
 }
 
-// Stack ndarrays
+/**
+ * @brief Stack multiple ndarrays along a new axis.
+ *
+ * Equivalent to NumPy's `np.stack`. Requirements:
+ *   - All arrays must have the *same shape*
+ *   - A new axis is inserted before indexing
+ *
+ * Example: stacking 3 arrays of shape (2,3) along axis=0  
+ * Result shape = (3,2,3)
+ *
+ * @tparam T Element type
+ * @param ndarrays Vector of ndarrays to stack
+ * @param axis Position of the new axis (0 ≤ axis ≤ ndim)
+ *
+ * @return ndarray<T> Stacked result array
+ *
+ * @throws std::runtime_error If:
+ *   - Input is empty
+ *   - Arrays have mismatched shapes
+ */
 template<typename T>
 ndarray<T> stack(const std::vector<ndarray<T>>& ndarrays, size_t axis = 0) {
     if (ndarrays.empty()) {
@@ -138,7 +175,26 @@ ndarray<T> stack(const std::vector<ndarray<T>>& ndarrays, size_t axis = 0) {
     return result;
 }
 
-// Split ndarray
+/**
+ * @brief Split an ndarray into multiple subarrays along a given axis.
+ *
+ * Behaves similarly to `np.split`.  
+ * The array is split into segments defined by `indices`, representing boundaries.
+ *
+ * Example:  
+ * shape = (10, 3), axis=0, indices = {2, 5}  
+ * Result → subarrays of sizes: [0–2], [2–5], [5–10]
+ *
+ * @tparam T Element type
+ * @param arr Input ndarray
+ * @param axis Axis along which the split occurs
+ * @param indices A list of split boundaries (exclusive)
+ *
+ * @return std::vector<ndarray<T>> List of resulting subarrays
+ *
+ * @throws std::runtime_error If:
+ *   - Axis is out of range
+ */
 template<typename T>
 std::vector<ndarray<T>> split(const ndarray<T>& arr, size_t axis, const std::vector<size_t>& indices) {
     if (axis >= arr.ndim()) {
@@ -184,7 +240,24 @@ std::vector<ndarray<T>> split(const ndarray<T>& arr, size_t axis, const std::vec
     return results;
 }
 
-// Repeat ndarray
+/**
+ * @brief Repeat elements of an ndarray along a given axis.
+ *
+ * Equivalent to NumPy's `np.repeat` (but repeats entire slices along the axis).
+ *
+ * Example:  
+ * arr.shape = (2,3), repeat = 2, axis = 0  
+ * Result.shape = (4,3)
+ *
+ * @tparam T Element type
+ * @param arr Input ndarray
+ * @param repeats Number of repetitions
+ * @param axis Axis along which to repeat
+ *
+ * @return ndarray<T> Repeated ndarray
+ *
+ * @throws std::runtime_error If axis is out of range
+ */
 template<typename T>
 ndarray<T> repeat(const ndarray<T>& arr, size_t repeats, size_t axis = 0) {
     if (axis >= arr.ndim()) {
@@ -217,7 +290,24 @@ ndarray<T> repeat(const ndarray<T>& arr, size_t repeats, size_t axis = 0) {
     return result;
 }
 
-// Tile ndarray
+/**
+ * @brief Tile an ndarray by repeating it across each dimension.
+ *
+ * Equivalent to NumPy's `np.tile`.  
+ * `reps` must match the number of dimensions of the array.
+ *
+ * Example:  
+ * arr.shape = (2, 1), reps = {2, 3}  
+ * Result.shape = (4, 3)
+ *
+ * @tparam T Element type
+ * @param arr Input ndarray
+ * @param reps Vector specifying repetitions along each axis
+ *
+ * @return ndarray<T> Tiled ndarray
+ *
+ * @throws std::runtime_error If reps.size() != arr.ndim()
+ */
 template<typename T>
 ndarray<T> tile(const ndarray<T>& arr, const std::vector<size_t>& reps) {
     if (reps.size() != arr.ndim()) {
@@ -245,3 +335,4 @@ ndarray<T> tile(const ndarray<T>& arr, const std::vector<size_t>& reps) {
 }
 
 } // namespace numbits
+
