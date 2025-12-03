@@ -4,6 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![PR: Welcome](https://img.shields.io/badge/PR-Welcome-orange.svg)
 ![Version: n/a](https://img.shields.io/badge/Version-n/a-red.svg)
+[![Related: Catplotlib](https://img.shields.io/badge/Related-Catplotlib-purple.svg)](https://github.com/Iro96/Catplotlib)
 ![Author: Iro96 - ndhquan](https://img.shields.io/badge/Author-Iro96-yellow.svg)
 
 A comprehensive NumPy-like library written entirely in C++17. NumBits provides multidimensional arrays, mathematical operations, linear algebra, broadcasting, and more - all implemented purely in C++.
@@ -427,3 +428,4 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 - Better broadcasting performance
 - SIMD optimizations
 - Sparse array support
+
